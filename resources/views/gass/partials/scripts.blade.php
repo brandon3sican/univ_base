@@ -217,13 +217,17 @@
         const submitBtn = document.getElementById('submitBtn');
         const projectIndicatorQuestion = document.getElementById('project_indicator_question');
         const activitySubactivityQuestion = document.getElementById('activity_subactivity_question');
+        const additionalFields = document.getElementById('additional_fields');
+        const parentSelection = document.getElementById('parent_selection');
 
         // Hide all conditional questions first
         projectIndicatorQuestion.classList.add('hidden');
         activitySubactivityQuestion.classList.add('hidden');
+        additionalFields.classList.add('hidden');
+        parentSelection.classList.add('hidden');
 
         if (recordType === 'program') {
-            // Program: Go directly to final step
+            // Program: Go directly to final step with only program name field
             step1.classList.add('hidden');
             step2.classList.add('hidden');
             step3.classList.remove('hidden');
@@ -231,6 +235,10 @@
             nextBtn.classList.add('hidden');
             submitBtn.classList.remove('hidden');
             currentStep = 3;
+            
+            // Only show program name field, hide all other fields
+            const programProjectActivity = document.getElementById('program_project_activity');
+            programProjectActivity.setAttribute('required', 'required');
         } else if (recordType === 'project') {
             // Project: Show indicator question
             step1.classList.add('hidden');

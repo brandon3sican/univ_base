@@ -113,15 +113,15 @@
                                             $tempCounter++;
                                         }
                                     }
-                                    
+
                                     if (!isset($subActivityCounters[$parentNumber])) {
                                         $subActivityCounters[$parentNumber] = 1;
                                     }
-                                    
+
                                     if ($r->id == $record->id) {
                                         return $parentNumber . '.' . $subActivityCounters[$parentNumber];
                                     }
-                                    
+
                                     $subActivityCounters[$parentNumber]++;
                                 }
                             }
@@ -281,7 +281,8 @@
         </div>
 
         <div class="p-6">
-            <p class="text-gray-700 mb-6">Are you sure you want to delete this GASS record? This action cannot be undone.
+            <p class="text-gray-700 mb-6">Are you sure you want to delete this GASS record? This action cannot be
+                undone.
             </p>
 
             <div class="flex items-center justify-end space-x-3">

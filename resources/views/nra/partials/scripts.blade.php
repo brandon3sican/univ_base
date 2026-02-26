@@ -16,10 +16,16 @@
 
         document.getElementById('project_indicator_question')?.classList.add('hidden');
         document.getElementById('activity_subactivity_question')?.classList.add('hidden');
+        document.getElementById('additional_fields')?.classList.add('hidden');
+        document.getElementById('parent_selection')?.classList.add('hidden');
 
         if (type === 'program') {
             document.getElementById('step3').classList.remove('hidden');
             currentStep = 3;
+            
+            // Only show program name field, hide all other fields
+            const programProjectActivity = document.getElementById('program_project_activity');
+            programProjectActivity?.setAttribute('required', 'required');
         } else if (type === 'project') {
             document.getElementById('step2').classList.remove('hidden');
             document.getElementById('project_indicator_question')?.classList.remove('hidden');
