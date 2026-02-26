@@ -10,8 +10,7 @@
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Built Assets -->
-    <link rel="stylesheet" href="{{ asset('build/assets/app-B0JqKCNL.css') }}">
-    <script src="{{ asset('build/assets/app-CAiCLEjY.js') }}" defer></script>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
 </head>

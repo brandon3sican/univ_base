@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
 @php
-    $pageTitle = 'GASS';
+    $pageTitle = 'STO';
 
     // Get all activities (both main and sub) for parent dropdown
-    $allActivities = \App\Models\Gass::where('record_type', 'activity')
+    $allActivities = \App\Models\Sto::where('record_type', 'activity')
         ->orderBy('order_column')
         ->get();
 
@@ -37,6 +37,37 @@
 @endphp
 
 @section('content')
+    <!-- Modern Page Header 
+            <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 mb-6 relative overflow-hidden">
+                <div class="absolute inset-0 bg-blue-50 opacity-50"></div>
+                <div class="relative z-10">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="flex items-center space-x-3 mb-2">
+                                <div class="bg-blue-600 rounded-xl p-2 shadow-lg">
+                                    <i class="fas fa-sitemap text-white text-xl"></i>
+                                </div>
+                                <div>
+                                    <h1 class="text-2xl font-bold text-gray-900 tracking-tight">STO</h1>
+                                    <p class="text-gray-600 text-sm font-medium">Support To Operations</p>
+                                </div>
+                            </div>
+                            <p class="text-gray-500 text-xs ml-14">Comprehensive management of programs, projects, and activities in
+                                hierarchical structure</p>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            Add New Record Button
+                            <button onclick="openCreateModal()"
+                                class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-all duration-200 flex items-center text-sm font-medium shadow hover:shadow-lg"
+                                title="Add New Record">
+                                <i class="fas fa-plus mr-2"></i>
+                                <span>Add New Record</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        -->
     <!-- Data Table Container -->
     <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
         <!-- Table Header with Summary Statistics -->
@@ -44,7 +75,7 @@
             <div class="flex items-center justify-between">
                 <div class="flex items-center">
                     <i class="fas fa-table mr-2"></i>
-                    <h2 class="text-lg font-bold">GASS Data Table</h2>
+                    <h2 class="text-lg font-bold">STO Data Table</h2>
                 </div>
                 <div class="flex items-center space-x-3">
                     <!-- Toggle Target Columns Button -->
@@ -934,15 +965,15 @@
                         }
                     @endphp
 
-                    @if(count($gassRecords) > 0)
-                        @php displayHierarchicalRecords($gassRecords); @endphp
+                    @if(count($stoRecords) > 0)
+                        @php displayHierarchicalRecords($stoRecords); @endphp
                     @else
                         <tr>
                             <td colspan="13" class="px-4 py-8 text-center text-gray-500">
                                 <div class="flex flex-col items-center">
                                     <i class="fas fa-inbox text-4xl text-gray-300 mb-3"></i>
                                     <p class="text-lg font-medium">No records found</p>
-                                    <p class="text-sm text-gray-400">Start by adding your first GASS record</p>
+                                    <p class="text-sm text-gray-400">Start by adding your first STO record</p>
                                 </div>
                             </td>
                         </tr>
@@ -956,28 +987,28 @@
             <div class="flex items-center justify-between">
                 <div class="text-sm text-gray-700">
                     <div class="flex items-center space-x-4">
-                        <span class="font-medium">{{ $gassRecords->count() }}</span>
-                        {{ $gassRecords->count() == 1 ? 'record' : 'records' }} total
+                        <span class="font-medium">{{ $stoRecords->count() }}</span>
+                        {{ $stoRecords->count() == 1 ? 'record' : 'records' }} total
                         <span class="text-gray-400">|</span>
                         <span class="text-blue-600 font-medium">
-                            {{ $gassRecords->where('record_type', 'program')->count() }}
-                            program{{ $gassRecords->where('record_type', 'program')->count() == 1 ? '' : 's' }}
+                            {{ $stoRecords->where('record_type', 'program')->count() }}
+                            program{{ $stoRecords->where('record_type', 'program')->count() == 1 ? '' : 's' }}
                         </span>
                         <span class="text-gray-400">|</span>
                         <span class="text-green-600 font-medium">
-                            {{ $gassRecords->where('record_type', 'project')->count() }}
-                            project{{ $gassRecords->where('record_type', 'project')->count() == 1 ? '' : 's' }}
+                            {{ $stoRecords->where('record_type', 'project')->count() }}
+                            project{{ $stoRecords->where('record_type', 'project')->count() == 1 ? '' : 's' }}
                         </span>
                         <span class="text-gray-400">|</span>
                         <span class="text-purple-600 font-medium">
-                            {{ $gassRecords->where('record_type', 'activity')->count() }}
-                            activit{{ $gassRecords->where('record_type', 'activity')->count() == 1 ? 'y' : 'ies' }}
+                            {{ $stoRecords->where('record_type', 'activity')->count() }}
+                            activit{{ $stoRecords->where('record_type', 'activity')->count() == 1 ? 'y' : 'ies' }}
                         </span>
-                        @if($gassRecords->where('record_type', 'activity')->whereNotNull('parent_id')->count() > 0)
+                        @if($stoRecords->where('record_type', 'activity')->whereNotNull('parent_id')->count() > 0)
                             <span class="text-gray-400">|</span>
                             <span class="text-orange-600 font-medium">
-                                {{ $gassRecords->where('record_type', 'activity')->whereNotNull('parent_id')->count() }}
-                                sub-activit{{ $gassRecords->where('record_type', 'activity')->whereNotNull('parent_id')->count() == 1 ? 'y' : 'ies' }}
+                                {{ $stoRecords->where('record_type', 'activity')->whereNotNull('parent_id')->count() }}
+                                sub-activit{{ $stoRecords->where('record_type', 'activity')->whereNotNull('parent_id')->count() == 1 ? 'y' : 'ies' }}
                             </span>
                         @endif
                     </div>
@@ -990,9 +1021,8 @@
             </div>
         </div>
     </div>
-    
 @endsection
 
-@include('gass.partials.scripts')
-@include('gass.partials.toggle')
-@include('gass.partials.modal')
+@include('sto.partials.scripts')
+@include('sto.partials.toggle')
+@include('sto.partials.modal')

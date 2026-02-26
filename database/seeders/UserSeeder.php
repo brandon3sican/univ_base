@@ -22,7 +22,14 @@ class UserSeeder extends Seeder
         ]);
 
         User::create([
-            'name' => 'Test User',
+            'name' => 'PENRO Abra',
+            'email' => 'penro.abra@denr.gov.ph',
+            'password' => Hash::make('password'),
+            'email_verified_at' => now(),
+        ]);
+
+        User::create([
+            'name' => 'PENRO Apayao',
             'email' => 'test@example.com',
             'password' => Hash::make('password'),
             'email_verified_at' => now(),

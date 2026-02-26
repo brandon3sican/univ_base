@@ -14,8 +14,7 @@
     <!-- Styles / Scripts -->
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
         <!-- Built Assets -->
-        <link rel="stylesheet" href="{{ asset('build/assets/app-B0JqKCNL.css') }}">
-        <script src="{{ asset('build/assets/app-CAiCLEjY.js') }}" defer></script>
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
     @else
         <style>
             /*! tailwindcss v4.0.7 | MIT License | https://tailwindcss.com */
