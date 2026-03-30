@@ -12,63 +12,29 @@ class Sto extends Model
     protected $table = 'sto';
 
     protected $fillable = [
-        'program_project_activity',
-        'output_indicators',
-        'office',
-        'universe',
-        'accomplishment',
-        'remarks',
-        'target_2024',
-        'target_2025',
-        'target_2026',
-        'target_2027',
-        'target_2028',
-        'order_column',
-        'parent_id',
-        'record_type',
+        'ppa_id',
+        'indicator_id',
+        'universe_id',
+        'accomplishment_id',
+        'targets_id',
     ];
 
     protected $casts = [
-        'order_column' => 'integer',
-        'parent_id' => 'integer',
+        'universe_id' => 'array',
+        'accomplishment_id' => 'array',
+        'targets_id' => 'array',
     ];
 
-    public function children()
+    public function ppa()
     {
-        return $this->hasMany(Sto::class, 'parent_id')->orderBy('order_column');
+        return $this->belongsTo(Ppa::class);
     }
 
-    public function parent()
+    public function indicator()
     {
-        return $this->belongsTo(Sto::class, 'parent_id');
+        return $this->belongsTo(Indicator::class);
     }
 
-    public function getBaselineAttribute()
-    {
-        if ($this->universe !== null && $this->accomplishment !== null) {
-            $universes = explode(',', $this->universe);
-            $accomplishments = explode(',', $this->accomplishment);
-            
-            $baselines = [];
-            foreach ($universes as $index => $universe) {
-                $accomplishment = isset($accomplishments[$index]) ? $accomplishments[$index] : 0;
-                $baselines[] = intval(trim($universe)) - intval(trim($accomplishment));
-            }
-            
-            return implode(',', $baselines);
-        }
-        return null;
-    }
-
-    public function getTotalTargetsAttribute()
-    {
-        $targets = [];
-        for ($year = 2024; $year <= 2028; $year++) {
-            $field = "target_{$year}";
-            if ($this->$field !== null) {
-                $targets[] = $this->$field;
-            }
-        }
-        return !empty($targets) ? implode(',', $targets) : null;
-    }
+    // Note: universe_id, accomplishment_id, and targets_id are JSON arrays
+// Use direct queries to access related records
 }

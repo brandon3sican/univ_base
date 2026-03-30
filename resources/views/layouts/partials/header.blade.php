@@ -3,6 +3,12 @@
     <div class="flex items-center justify-between px-6 py-4">
         <!-- Page Title Section -->
         <div class="flex items-center space-x-4">
+            <!-- Sidebar Toggle Button -->
+            <button onclick="toggleSidebar()" id="sidebarToggleBtn"
+                class="p-2.5 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all duration-200 group">
+                <i id="sidebarToggleIcon" class="fas fa-bars text-lg transition-transform duration-200"></i>
+            </button>
+            
             <div class="w-1 h-8 bg-gradient-to-b from-green-500 to-green-600 rounded-full"></div>
             <div>
                 <h1 class="text-2xl font-bold text-gray-800 tracking-tight">{{ $pageTitle }}</h1>

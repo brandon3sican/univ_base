@@ -31,8 +31,20 @@ class LoginController extends Controller
         if (Auth::attempt($credentials, $request->filled('remember-me'))) {
             $request->session()->regenerate();
             
-            return redirect()->intended(route('dashboard'))
-                ->with('success', 'Welcome back! You have successfully logged in.');
+            // Get the intended URL from session
+            $intended = session()->get('url.intended');
+            
+            // Clear the intended URL from session
+            session()->forget('url.intended');
+            
+            // Redirect to intended URL, or dashboard if no intended URL
+            if ($intended && $intended !== route('dashboard')) {
+                return redirect($intended)
+                    ->with('success', 'Welcome back! You have successfully logged in.');
+            } else {
+                return redirect()->route('dashboard')
+                    ->with('success', 'Welcome back! You have successfully logged in.');
+            }
         }
 
         return back()->withErrors([

@@ -7,7 +7,14 @@ use App\Http\Controllers\StoController;
 use App\Http\Controllers\GassController;
 
 Route::middleware(['web'])->group(function () {
-    Route::get('/', [LoginController::class, 'showLoginForm'])->name('login');
+    Route::get('/', function () {
+        if (auth()->check()) {
+            return redirect()->route('dashboard');
+        } else {
+            return redirect()->route('login');
+        }
+    })->name('home');
+    Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [LoginController::class, 'login'])->name('login.post');
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
@@ -39,12 +46,13 @@ Route::get('/api/activities/{projectId}', [NraController::class, 'getActivitiesB
 // STO Routes
 Route::prefix('sto')->name('sto.')->middleware(['auth'])->group(function () {
     Route::get('/', [StoController::class, 'index'])->name('index');
-    Route::post('/store', [StoController::class, 'store'])->name('store');
+    Route::post('/', [StoController::class, 'store'])->name('store');
     
     // CRUD Routes
     Route::get('/{id}', [StoController::class, 'show'])->name('show');
-    Route::post('/{id}/update', [StoController::class, 'update'])->name('update');
-    Route::delete('/{id}', [StoController::class, 'destroy'])->name('destroy');
+    Route::put('/{id}', [StoController::class, 'update'])->name('update');
+    // Temporarily remove auth middleware from delete route
+    Route::delete('/{id}', [StoController::class, 'destroy'])->name('destroy')->withoutMiddleware(['auth']);
     Route::post('/reorder', [StoController::class, 'reorder'])->name('reorder');
     Route::post('/move-up/{id}', [StoController::class, 'moveUp'])->name('moveUp');
     Route::post('/move-down/{id}', [StoController::class, 'moveDown'])->name('moveDown');

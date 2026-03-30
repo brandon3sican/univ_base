@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
     <style>
         body {
-            font-family: 'Raleway', sans-serif;
+            font-family: "Lucida Console", "Courier New", monospace;
         }
 
         .sidebar {
