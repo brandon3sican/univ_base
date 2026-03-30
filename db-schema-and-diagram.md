@@ -117,6 +117,11 @@ erDiagram
     indicators ||--o{ ppa : "measures"
     indicators ||--o{ sto : "tracks"
     ppa ||--o{ sto : "implements"
+    
+    %% STO JSON Relationships
+    sto ||--o{ sto_universe : "via JSON array"
+    sto ||--o{ sto_accomplishments : "via JSON array"
+    sto ||--o{ sto_targets : "via JSON array"
 ```
 
 ---
@@ -138,10 +143,10 @@ flowchart TD
     P --> STO[sto]
     I --> STO
     
-    %% STO Data Tables
-    STO --> SU[sto_universe]
-    STO --> SA[sto_accomplishments]
-    STO --> ST[sto_targets]
+    %% STO Data Tables (connected via JSON)
+    STO -.->|universe_id| SU[sto_universe]
+    STO -.->|accomplishment_id| SA[sto_accomplishments]
+    STO -.->|targets_id| ST[sto_targets]
     
     %% JSON Connections
     O -.->|office_id| P
@@ -151,9 +156,9 @@ flowchart TD
     %% Self-reference
     PD --> PD
     
-    styling classDef primary fill:#e1f5fe,stroke:#01579b,stroke-width:2px
-    styling classDef secondary fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
-    styling classDef sto fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
+    classDef primary fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef secondary fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef sto fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
     
     class OT,O,RT,PD,T,I primary
     class P,STO secondary
@@ -197,15 +202,19 @@ graph TB
 ```mermaid
 graph LR
     subgraph STO System
-        STO[sto<br/>Main Records]
-        SU[sto_universe<br/>Baseline]
-        SA[sto_accomplishments<br/>History]
-        ST[sto_targets<br/>Future]
+        STO[sto<br/>Main Records<br/>JSON Arrays]
+        SU[sto_universe<br/>Baseline Data]
+        SA[sto_accomplishments<br/>History Data]
+        ST[sto_targets<br/>Future Data]
     end
     
-    STO -->|references| SU
-    STO -->|references| SA
-    STO -->|references| ST
+    STO -.->|universe_id| SU
+    STO -.->|accomplishment_id| SA
+    STO -.->|targets_id| ST
+    
+    %% Note about JSON connections
+    note[Note: Connections via JSON arrays<br/>sto.universe_id = [1, 2, 3]<br/>sto.accomplishment_id = [4, 5]<br/>sto.targets_id = [6, 7, 8]]
+    note --> STO
 ```
 
 ---
@@ -275,11 +284,11 @@ graph TD
     P7 --> P10[1.1.1. SUB-SUB-ACTIVITY 1.1.1.1]
     P7 --> P11[1.1.2. SUB-SUB-ACTIVITY 1.1.1.2]
     
-    styling classDef program fill:#14423f,color:white
-    styling classDef project fill:#306b40,color:white
-    styling classDef main fill:#66a558,color:white
-    styling classDef sub fill:#5c463e,color:white
-    styling classDef subsub fill:#3a272b,color:white
+    classDef program fill:#14423f,color:white
+    classDef project fill:#306b40,color:white
+    classDef main fill:#66a558,color:white
+    classDef sub fill:#5c463e,color:white
+    classDef subsub fill:#3a272b,color:white
     
     class P1 program
     class P2,P3 project
@@ -335,10 +344,16 @@ graph LR
         offices.id --> ppa.office_id
         offices.id --> sto_universe.office_ids
         offices.id --> sto_accomplishments.office_ids
+        
+        %% STO JSON Relationships (corrected)
         sto_universe.id --> sto.universe_id
         sto_accomplishments.id --> sto.accomplishment_id
         sto_targets.id --> sto.targets_id
     end
+    
+    %% Note about JSON array storage
+    note[Note: sto table stores<br/>JSON arrays of IDs<br/>not foreign keys]
+    note --> sto
 ```
 
 ---
@@ -405,17 +420,20 @@ graph TD
     B --> F
     F --> H[sto]
     E --> H
-    I[sto_universe] --> H
-    J[sto_accomplishments] --> H
-    K[sto_targets] --> H
     
-    styling classDef base fill:#ffeb3b
-    styling classDef structure fill:#4caf50
-    styling classDef sto fill:#2196f3
+    %% STO Data Tables (independent but referenced by sto)
+    I[sto_universe] -.-> H
+    J[sto_accomplishments] -.-> H
+    K[sto_targets] -.-> H
+    
+    classDef base fill:#ffeb3b
+    classDef structure fill:#4caf50
+    classDef sto fill:#2196f3
+    classDef sto_data fill:#ff9800
     
     class A,B,C,D,E,G base
-    class F structure
-    class H,I,J,K sto
+    class F,H sto
+    class I,J,K sto_data
 ```
 
 ---
@@ -456,9 +474,9 @@ graph TB
     STO --> SA
     STO --> ST
     
-    styling classDef foundation fill:#e3f2fd,stroke:#1976d2
-    styling classDef business fill:#f3e5f5,stroke:#7b1fa2
-    styling classDef analytics fill:#e8f5e8,stroke:#388e3c
+    classDef foundation fill:#e3f2fd,stroke:#1976d2
+    classDef business fill:#f3e5f5,stroke:#7b1fa2
+    classDef analytics fill:#e8f5e8,stroke:#388e3c
     
     class OT,O,RT,PD,T,I foundation
     class P business
