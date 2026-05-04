@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('sto', function (Blueprint $table) {
+        Schema::create('gass', function (Blueprint $table) {
             $table->id();
             $table->foreignId('ppa_id')->nullable()->constrained('ppa')->onDelete('set null');
             $table->foreignId('indicator_id')->nullable()->constrained('indicators')->onDelete('set null');
@@ -24,6 +24,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('sto');
+        Schema::dropIfExists('gass');
     }
 };

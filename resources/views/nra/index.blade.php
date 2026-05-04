@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @php
-    $pageTitle = 'STO';
+    $pageTitle = 'NRA';
 @endphp
 
 @section('content')
@@ -12,7 +12,7 @@
             <div class="flex items-center justify-between">
                 <div class="flex items-center">
                     <i class="fas fa-table mr-2"></i>
-                    <h2 class="text-lg font-bold">STO Data Table</h2>
+                    <h2 class="text-lg font-bold">NRA Data Table</h2>
                 </div>
                 <div class="flex items-center space-x-3">
                     <!-- Toggle Actions Column Button -->
@@ -179,8 +179,8 @@
     </div>
 @endsection
 
-@include('sto.partials.toggle')
-@include('sto.partials.modal', ['offices' => $offices ?? [], 'ppas' => $ppas ?? []])
+@include('nra.partials.toggle')
+@include('nra.partials.modal', ['offices' => $offices ?? [], 'ppas' => $ppas ?? []])
 
 <script>
     let currentEditId = null;
@@ -191,13 +191,13 @@
 
     // Initialize the page
     document.addEventListener('DOMContentLoaded', function() {
-        loadStoData();
+        loadNraData();
         loadFormData();
     });
 
-    // Load STO data for the table
-    function loadStoData() {
-        fetch('/sto', {
+    // Load NRA data for the table
+    function loadNraData() {
+        fetch('/nra', {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
@@ -207,12 +207,12 @@
             .then(data => {
                 renderTable(data);
             })
-            .catch(error => console.error('Error loading STO data:', error));
+            .catch(error => console.error('Error loading NRA data:', error));
     }
 
     // Load form data (PPAs and Indicators)
     function loadFormData() {
-        fetch('/sto/create', {
+        fetch('/nra/create', {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
@@ -246,11 +246,11 @@
             recordTypeSelect.innerHTML = '<option value="">Select Record Type</option>';
         }
 
-        // Add PPA options (only STO PPAs - types_id = 2)
+        // Add PPA options (only NRA PPAs - types_id = 7)
         if (ppaSelect) {
             ppas.forEach(ppa => {
-                // Only show PPAs that belong to STO (types_id = 2)
-                if (ppa.types_id === 2) {
+                // Only show PPAs that belong to NRA (types_id = 7)
+                if (ppa.types_id === 7) {
                     const option = document.createElement('option');
                     option.value = ppa.id;
                     option.textContent = ppa.name || `PPA ${ppa.id}`;
@@ -591,14 +591,14 @@
             return;
         }
 
-        // Fetch PPAs for the selected record type (STO-specific endpoint)
-        fetch(`/api/sto/ppas?record_type_id=${selectedRecordTypeId}`)
+        // Fetch PPAs for the selected record type
+        fetch(`/api/nra/ppas?record_type_id=${selectedRecordTypeId}`)
             .then(response => response.json())
             .then(data => {
-                // Add filtered PPAs to dropdown (only STO PPAs - types_id = 2)
+                // Add filtered PPAs to dropdown (only NRA PPAs - types_id = 7)
                 data.forEach(ppa => {
-                    // Only show PPAs that belong to STO (types_id = 2)
-                    if (ppa.types_id === 2) {
+                    // Only show PPAs that belong to NRA (types_id = 7)
+                    if (ppa.types_id === 7) {
                         const option = document.createElement('option');
                         option.value = ppa.id;
                         option.textContent = ppa.name;
@@ -1570,7 +1570,7 @@
             }
 
             // Add types_id for new PPA creation (required field in PPA table)
-            submitFormData.append('types_id', '2'); // STO type
+            submitFormData.append('types_id', '7'); // Default type - controller can adjust if needed
 
             // Add ppa_details_id (nullable, can be set by controller)
             submitFormData.append('ppa_details_id', ''); // Empty for now
@@ -1653,7 +1653,7 @@
         submitFormData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute(
             'content'));
 
-        const url = currentEditId ? `/sto/${currentEditId}` : '/sto';
+        const url = currentEditId ? `/nra/${currentEditId}` : '/nra';
         const method = currentEditId ? 'POST' :
             'POST'; // Use POST for both, Laravel will handle method spoofing
 
@@ -1691,7 +1691,7 @@
             .then(data => {
                 if (data.success) {
                     closeModal();
-                    loadStoData();
+                    loadNraData();
                     showNotification(data.message, 'success');
                 } else {
                     // Handle validation errors specifically
@@ -1720,15 +1720,15 @@
         currentEditId = id;
 
         // Fetch the record data
-        fetch(`/sto/${id}/edit`)
+        fetch(`/nra/${id}/edit`)
             .then(response => response.json())
             .then(data => {
                 // Populate form fields with the record data
-                const record = data.sto;
+                const record = data.nra;
                 const ppas = data.ppas || [];
 
                 // Set basic fields
-                document.getElementById('modalTitle').textContent = 'Edit STO Record';
+                document.getElementById('modalTitle').textContent = 'Edit NRA Record';
                 document.getElementById('record_type_id').value = record.record_type_id || '';
                 document.getElementById('indicator_id').value = record.indicator_id || '';
 
@@ -1767,7 +1767,7 @@
     }
 
     function confirmDelete() {
-        fetch(`/sto/${currentEditId}`, {
+        fetch(`/nra/${currentEditId}`, {
                 method: 'DELETE',
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
@@ -1777,7 +1777,7 @@
             .then(data => {
                 if (data.success) {
                     closeDeleteModal();
-                    loadStoData();
+                    loadNraData();
                     showNotification(data.message, 'success');
                 } else {
                     showNotification('Error occurred', 'error');
@@ -2036,7 +2036,7 @@
     // Open create modal
     function openCreateModal() {
         currentEditId = null;
-        document.getElementById('modalTitle').textContent = 'Add New STO Record';
+        document.getElementById('modalTitle').textContent = 'Add New NRA Record';
         document.getElementById('crudForm').reset();
         clearDynamicFields();
         document.getElementById('crudModal').classList.remove('hidden');
@@ -2077,7 +2077,7 @@
             console.log('Refreshing parent activities for:', recordTypeName);
 
             // Fetch fresh data from server using the same endpoint as initial load
-            fetch('/sto/create', {
+            fetch('/nra/create', {
                     headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json'

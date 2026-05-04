@@ -3,7 +3,7 @@
     <div class="relative top-20 mx-auto p-5 border shadow-lg rounded-lg bg-white" style="width: 95vw; max-width: 1600px;">
         <div class="bg-white rounded-lg shadow-xl transform transition-all">
             <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-                <h3 class="text-lg font-semibold text-gray-900" id="modalTitle">Add New STO Record</h3>
+                <h3 class="text-lg font-semibold text-gray-900" id="modalTitle">Add New Record</h3>
                 <button type="button" onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
                     <i class="fas fa-times text-xl"></i>
                 </button>
@@ -13,7 +13,7 @@
             <form id="crudForm" class="px-6 py-4 space-y-4">
                 @csrf
                 <input type="hidden" id="recordId" name="id">
-                <input type="hidden" id="type" name="type" value="2">
+                <input type="hidden" id="type" name="type" value="4">
 
                 <!-- Record Type Selection -->
                 <div>
@@ -33,7 +33,7 @@
                         onchange="handlePpaSelection()">
                         <option value="">Select PPA</option>
                         @foreach ($ppas as $ppa)
-                            @if ($ppa->types_id == 2)
+                            @if ($ppa->types_id == 4)
                                 <option value="{{ $ppa->id }}">{{ $ppa->name }}</option>
                             @endif
                         @endforeach
@@ -250,7 +250,8 @@
                 <i class="fas fa-exclamation-triangle text-red-600"></i>
             </div>
             <h3 class="text-lg font-medium text-gray-900 mb-2">Delete Record</h3>
-            <p class="text-sm text-gray-500 mb-4">Are you sure you want to delete this STO record? This action cannot
+            <p class="text-sm text-gray-500 mb-4">Are you sure you want to delete this BIODIVERSITY record? This action
+                cannot
                 be undone.</p>
             <div class="flex justify-center space-x-3">
                 <button onclick="closeDeleteModal()"

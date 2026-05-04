@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Sto extends Model
+class Enf extends Model
 {
-    protected $table = 'sto';
+    use HasFactory;
+
+    protected $table = 'enf';
 
     protected $fillable = [
         'ppa_id',
@@ -16,11 +19,12 @@ class Sto extends Model
         'universe',
         'accomplishment',
         'targets',
-        'years',
         'remarks',
+        'years',
     ];
 
     protected $casts = [
+        'office_id' => 'array',
         'universe' => 'array',
         'accomplishment' => 'array',
         'targets' => 'array',

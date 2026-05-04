@@ -6,7 +6,8 @@
     <div class="sidebar-expanded-header p-3 flex items-center justify-between border-b border-green-600">
         <div class="flex items-center space-x-2">
             <img src="{{ asset('img/denr-logo.png') }}" alt="Logo" class="w-8 h-8 flex-shrink-0">
-            <span class="sidebar-text text-sm font-bold transition-all duration-300 ease-in-out">UNIVERSE | BASELINE</span>
+            <span class="sidebar-text text-sm font-bold transition-all duration-300 ease-in-out">UNIVERSE |
+                BASELINE</span>
         </div>
     </div>
 
@@ -21,7 +22,8 @@
 
             <!-- Main -->
             <div>
-                    <div class="text-xs uppercase text-white/60 font-semibold tracking-wider mb-2 px-1 sidebar-text transition-all duration-300 ease-in-out">
+                <div
+                    class="text-xs uppercase text-white/60 font-semibold tracking-wider mb-2 px-1 sidebar-text transition-all duration-300 ease-in-out">
                     Main
                 </div>
                 <a href="{{ route('dashboard') }}"
@@ -37,12 +39,13 @@
 
             <!-- UBs Dropdown -->
             <div>
-                    <div class="text-xs uppercase text-white/60 font-semibold tracking-wider mb-2 px-1 sidebar-text transition-all duration-300 ease-in-out">
+                <div
+                    class="text-xs uppercase text-white/60 font-semibold tracking-wider mb-2 px-1 sidebar-text transition-all duration-300 ease-in-out">
                     UBs
                 </div>
                 <div class="relative">
                     <button onclick="toggleProgramsDropdown()"
-                        class="sidebar-nav-item group relative w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-white/90 transition-all duration-200 hover:bg-emerald-700/20 hover:translate-x-1 hover:shadow-sm active:scale-[0.98] {{ request()->routeIs('gass.*') || request()->routeIs('sto.*') || request()->routeIs('nra.*') ? 'active bg-emerald-600/40' : '' }}">
+                        class="sidebar-nav-item group relative w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-white/90 transition-all duration-200 hover:bg-emerald-700/20 hover:translate-x-1 hover:shadow-sm active:scale-[0.98] {{ request()->routeIs('gass.*') || request()->routeIs('sto.*') ? 'active bg-emerald-600/40' : '' }}">
                         <div class="flex items-center">
                             <i
                                 class="fas fa-file w-5 text-center transition-transform duration-200 group-hover:scale-110 flex-shrink-0"></i>
@@ -74,32 +77,35 @@
                             </div>
                         </a>
 
-                        <a href="#"
-                            class="sidebar-nav-item group relative flex items-center px-4 py-2 text-white/85 rounded-lg transition-all duration-200 hover:bg-emerald-700/15 hover:translate-x-1.5 hover:shadow-sm active:scale-[0.98]">
+                        <a href="{{ route('enf.index') }}"
+                            class="sidebar-nav-item group relative flex items-center px-4 py-2 text-white/85 rounded-lg transition-all duration-200 hover:bg-emerald-700/15 hover:translate-x-1.5 hover:shadow-sm active:scale-[0.98] {{ request()->routeIs('enf.index') ? 'active bg-emerald-600/30' : '' }}">
                             <i class="fas fa-circle text-xs mr-2 flex-shrink-0"></i>
                             <span class="sidebar-text transition-all duration-300 ease-in-out">ENF</span>
+                            <div
+                                class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-emerald-300 rounded-r opacity-0 group-[.active]:opacity-100 transition-opacity">
+                            </div>
                         </a>
 
-                        <a href="#"
+                        <a href="{{ route('biodiversity.index') }}"
                             class="sidebar-nav-item group relative flex items-center px-4 py-2 text-white/85 rounded-lg transition-all duration-200 hover:bg-emerald-700/15 hover:translate-x-1.5 hover:shadow-sm active:scale-[0.98]">
                             <i class="fas fa-circle text-xs mr-2 flex-shrink-0"></i>
                             <span class="sidebar-text transition-all duration-300 ease-in-out">Biodiversity</span>
                         </a>
 
-                        <a href="#"
+                        <a href="{{ route('lands.index') }}"
                             class="sidebar-nav-item group relative flex items-center px-4 py-2 text-white/85 rounded-lg transition-all duration-200 hover:bg-emerald-700/15 hover:translate-x-1.5 hover:shadow-sm active:scale-[0.98]">
                             <i class="fas fa-circle text-xs mr-2 flex-shrink-0"></i>
                             <span class="sidebar-text transition-all duration-300 ease-in-out">Lands</span>
                         </a>
 
-                        <a href="#"
-                            class="sidebar-nav-item group relative flex items-center px-4 py-2 text-white/85 rounded-lg transition-all duration-200 hover:bg-emerald-700/15 hover:translate-x-1.5 hover:shadow-sm active:scale-[0.98]">
+                        <a href="{{ route('soilcon.index') }}"
+                            class="sidebar-nav-item group relative flex items-center px-4 py-2 text-white/85 rounded-lg transition-all duration-200 hover:bg-emerald-700/15 hover:translate-x-1.5 hover:shadow-sm active:scale-[0.98] {{ request()->routeIs('soilcon.index') ? 'bg-emerald-700/25' : '' }}">
                             <i class="fas fa-circle text-xs mr-2 flex-shrink-0"></i>
                             <span class="sidebar-text transition-all duration-300 ease-in-out">Soilcon</span>
                         </a>
 
                         <a href="{{ route('nra.index') }}"
-                            class="sidebar-nav-item group relative flex items-center px-4 py-2 text-white/85 rounded-lg transition-all duration-200 hover:bg-emerald-700/15 hover:translate-x-1.5 hover:shadow-sm active:scale-[0.98] {{ request()->routeIs('nra.index') ? 'active bg-emerald-600/30' : '' }}">
+                            class="sidebar-nav-item group relative flex items-center px-4 py-2 text-white/85 rounded-lg transition-all duration-200 hover:bg-emerald-700/15 hover:translate-x-1.5 hover:shadow-sm active:scale-[0.98] {{ request()->routeIs('nra.index') ? 'active' : '' }}">
                             <i class="fas fa-circle text-xs mr-2 flex-shrink-0"></i>
                             <span class="sidebar-text transition-all duration-300 ease-in-out">NRA</span>
                             <div
@@ -112,12 +118,14 @@
 
             <!-- System Administration -->
             <div>
-                <div class="text-xs uppercase text-white/60 font-semibold tracking-wider mb-2 px-1 sidebar-text transition-all duration-300 ease-in-out">
+                <div
+                    class="text-xs uppercase text-white/60 font-semibold tracking-wider mb-2 px-1 sidebar-text transition-all duration-300 ease-in-out">
                     System Administration
                 </div>
                 <a href="#"
                     class="sidebar-nav-item group relative flex items-center px-3 py-2.5 rounded-lg text-white/90 transition-all duration-200 hover:bg-emerald-700/20 hover:translate-x-1 hover:shadow-sm active:scale-[0.98]">
-                    <i class="fas fa-cog w-5 text-center transition-transform duration-200 group-hover:scale-110 flex-shrink-0"></i>
+                    <i
+                        class="fas fa-cog w-5 text-center transition-transform duration-200 group-hover:scale-110 flex-shrink-0"></i>
                     <span class="sidebar-text ml-3 transition-all duration-300 ease-in-out">Settings</span>
                 </a>
             </div>
@@ -132,22 +140,25 @@
             <a href="{{ route('dashboard') }}"
                 class="group flex justify-center p-3 rounded-lg text-white/90 transition-all duration-200 hover:bg-emerald-700/20 active:scale-[0.98] {{ request()->routeIs('dashboard') ? 'bg-emerald-600/40' : '' }}"
                 title="Dashboard">
-                <i class="fas fa-tachometer-alt w-5 text-center transition-transform duration-200 group-hover:scale-110"></i>
+                <i
+                    class="fas fa-tachometer-alt w-5 text-center transition-transform duration-200 group-hover:scale-110"></i>
             </a>
 
             <!-- UBs Dropdown with Click -->
             <div class="dropdown-container" style="position: relative;">
-                <button
-                    onclick="toggleDropdown('ubs-dropdown')"
-                    class="flex justify-center p-3 rounded-lg text-white/90 transition-all duration-200 hover:bg-emerald-700/20 active:scale-[0.98] {{ request()->routeIs('gass.*') || request()->routeIs('sto.*') || request()->routeIs('nra.*') ? 'bg-emerald-600/40' : '' }}"
+                <button onclick="toggleDropdown('ubs-dropdown')"
+                    class="flex justify-center p-3 rounded-lg text-white/90 transition-all duration-200 hover:bg-emerald-700/20 active:scale-[0.98] {{ request()->routeIs('gass.*') || request()->routeIs('sto.*') ? 'bg-emerald-600/40' : '' }}"
                     title="UBs">
                     <i class="fas fa-file w-5 text-center transition-transform duration-200 hover:scale-110"></i>
                 </button>
-                
+
                 <!-- Dropdown Menu -->
-                <div id="ubs-dropdown" class="dropdown-menu" style="position: fixed; left: 80px; top: auto; display: none; z-index: 1000;">
-                    <div class="bg-gradient-to-b from-green-700 to-emerald-800 rounded-lg shadow-xl border border-green-600 py-2 min-w-48">
-                        <div class="px-3 py-2 text-xs font-semibold text-white/80 uppercase tracking-wider border-b border-green-600">
+                <div id="ubs-dropdown" class="dropdown-menu"
+                    style="position: fixed; left: 80px; top: auto; display: none; z-index: 1000;">
+                    <div
+                        class="bg-gradient-to-b from-green-700 to-emerald-800 rounded-lg shadow-xl border border-green-600 py-2 min-w-48">
+                        <div
+                            class="px-3 py-2 text-xs font-semibold text-white/80 uppercase tracking-wider border-b border-green-600">
                             UBs
                         </div>
                         <a href="{{ route('gass.index') }}"
@@ -160,23 +171,23 @@
                             <i class="fas fa-circle text-xs mr-3 text-green-300"></i>
                             STO
                         </a>
-                        <a href="#"
-                            class="flex items-center px-3 py-2 text-sm text-white/90 hover:bg-emerald-600/30 transition-colors">
+                        <a href="{{ route('enf.index') }}"
+                            class="flex items-center px-3 py-2 text-sm text-white/90 hover:bg-emerald-600/30 transition-colors {{ request()->routeIs('enf.index') ? 'bg-emerald-600/40' : '' }}">
                             <i class="fas fa-circle text-xs mr-3 text-green-300"></i>
                             ENF
                         </a>
-                        <a href="#"
+                        <a href="{{ route('biodiversity.index') }}"
                             class="flex items-center px-3 py-2 text-sm text-white/90 hover:bg-emerald-600/30 transition-colors">
                             <i class="fas fa-circle text-xs mr-3 text-green-300"></i>
                             Biodiversity
                         </a>
-                        <a href="#"
+                        <a href="{{ route('lands.index') }}"
                             class="flex items-center px-3 py-2 text-sm text-white/90 hover:bg-emerald-600/30 transition-colors">
                             <i class="fas fa-circle text-xs mr-3 text-green-300"></i>
                             Lands
                         </a>
-                        <a href="#"
-                            class="flex items-center px-3 py-2 text-sm text-white/90 hover:bg-emerald-600/30 transition-colors">
+                        <a href="{{ route('soilcon.index') }}"
+                            class="flex items-center px-3 py-2 text-sm text-white/90 hover:bg-emerald-600/30 transition-colors {{ request()->routeIs('soilcon.index') ? 'bg-emerald-600/40' : '' }}">
                             <i class="fas fa-circle text-xs mr-3 text-green-300"></i>
                             Soilcon
                         </a>
@@ -219,7 +230,8 @@
     </div>
 
     <!-- Collapsed User Info -->
-    <div class="sidebar-collapsed-footer hidden absolute bottom-0 left-0 right-0 p-2 border-t border-green-600 bg-gradient-to-b from-transparent to-green-800/50">
+    <div
+        class="sidebar-collapsed-footer hidden absolute bottom-0 left-0 right-0 p-2 border-t border-green-600 bg-gradient-to-b from-transparent to-green-800/50">
         <div class="flex justify-center">
             <!-- Logout Button Only -->
             <form method="POST" action="{{ route('logout') }}" class="inline">
@@ -243,11 +255,10 @@
     }
 
     // Auto-open when child is active
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
         const isUBsActive =
-        {{ request()->routeIs('gass.*') ? 'true' : 'false' }} ||
-        {{ request()->routeIs('sto.*') ? 'true' : 'false' }} ||
-        {{ request()->routeIs('nra.*') ? 'true' : 'false' }};
+            {{ request()->routeIs('gass.*') ? 'true' : 'false' }} ||
+            {{ request()->routeIs('sto.*') ? 'true' : 'false' }}
 
         if (isUBsActive) {
             document.getElementById('programs-dropdown')?.classList.remove('hidden');

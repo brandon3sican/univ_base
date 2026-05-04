@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use App\Models\OfficeType;
 use App\Models\Office;
+use App\Models\OfficeType;
 use App\Models\RecordType;
+use Illuminate\Database\Seeder;
 
 class EssentialsSeeder extends Seeder
 {
@@ -42,8 +42,9 @@ class EssentialsSeeder extends Seeder
             ['name' => 'PROGRAM', 'desc' => 'Program level record'],
             ['name' => 'PROJECT', 'desc' => 'Project level record'],
             ['name' => 'MAIN ACTIVITY', 'desc' => 'Main activity record'],
-            ['name' => 'SUB-ACTIVITY', 'desc' => 'Sub-activity record'],
-            ['name' => 'SUB-SUB-ACTIVITY', 'desc' => 'Sub-sub-activity record'],
+            ['name' => 'MAJOR ACTIVITY', 'desc' => 'Major activity record'],
+            ['name' => 'SUB ACTIVITY', 'desc' => 'Sub activity record'],
+            ['name' => 'ACTIONABLE TASK', 'desc' => 'Actionable task record'],
         ];
 
         foreach ($recordTypes as $type) {

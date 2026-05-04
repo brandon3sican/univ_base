@@ -3,32 +3,32 @@
 namespace App\Http\Controllers;
 
 use App\Models\Indicator;
+use App\Models\Nra;
 use App\Models\Office;
 use App\Models\Ppa;
 use App\Models\RecordType;
-use App\Models\Sto;
 use App\Models\Type;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
-class StoController extends Controller
+class NraController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $stos = Sto::with(['ppa.recordType', 'indicator', 'office'])->get();
+        $nras = Nra::with(['ppa.recordType', 'indicator', 'office'])->get();
 
         if (request()->expectsJson()) {
-            return response()->json($stos);
+            return response()->json($nras);
         }
 
         $offices = Office::all();
-        $ppas = Ppa::where('types_id', 2)->get();
+        $ppas = Ppa::where('types_id', 7)->get();
 
-        return view('sto.index', compact('stos', 'offices', 'ppas'));
+        return view('nra.index', compact('nras', 'offices', 'ppas'));
     }
 
     /**
@@ -36,7 +36,7 @@ class StoController extends Controller
      */
     public function create()
     {
-        $ppas = Ppa::where('types_id', 2)->get();
+        $ppas = Ppa::where('types_id', 7)->get();
         $indicators = Indicator::all();
         $offices = Office::all();
         $recordTypes = RecordType::all();
@@ -46,7 +46,7 @@ class StoController extends Controller
             'indicators' => $indicators,
             'offices' => $offices,
             'recordTypes' => $recordTypes,
-            'type' => Type::where('code', 'STO')->first(),
+            'type' => Type::where('code', 'NRA')->first(),
         ]);
     }
 
@@ -74,7 +74,7 @@ class StoController extends Controller
             ]);
 
             // Debug: Log validation data
-            \Log::info('STO Store Request Data:', $request->all());
+            \Log::info('NRA Store Request Data:', $request->all());
 
             // Handle PPA creation if new PPA is provided
             $ppaId = $request->ppa_id;
@@ -89,7 +89,7 @@ class StoController extends Controller
                 }
 
                 // Debug: Log PPA creation data
-                Log::info('Creating PPA for STO with data:', [
+                Log::info('Creating PPA with data:', [
                     'name' => $request->new_ppa_name,
                     'record_type_id' => $request->record_type_id,
                     'types_id' => $request->types_id,
@@ -171,8 +171,8 @@ class StoController extends Controller
                 $years = json_decode($years, true) ?? null;
             }
 
-            // Create STO record - ensure JSON fields are properly encoded
-            $stoData = [
+            // Create NRA record - ensure JSON fields are properly encoded
+            $nraData = [
                 'ppa_id' => $ppaId,
                 'indicator_id' => $indicatorId,
                 'office_id' => $officeId ? json_encode($officeId) : null,
@@ -184,16 +184,16 @@ class StoController extends Controller
             ];
 
             // Debug: Log the data being saved
-            \Log::info('STO Data to be saved:', $stoData);
+            \Log::info('NRA Data to be saved:', $nraData);
             \Log::info('Universe type: '.gettype($universe));
             \Log::info('Universe value: '.var_export($universe, true));
 
-            $sto = Sto::create($stoData);
+            $nra = Nra::create($nraData);
 
             return response()->json([
                 'success' => true,
-                'message' => 'STO record created successfully',
-                'data' => $sto->load(['ppa', 'indicator', 'office']),
+                'message' => 'NRA record created successfully',
+                'data' => $nra->load(['ppa', 'indicator', 'office']),
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             \Log::error('Validation Error: '.$e->getMessage());
@@ -205,7 +205,7 @@ class StoController extends Controller
                 'errors' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
-            Log::error('STO Store Error: '.$e->getMessage());
+            Log::error('GASS Store Error: '.$e->getMessage());
             Log::error('Stack trace: '.$e->getTraceAsString());
             Log::error('Request data: '.json_encode($request->all()));
 
@@ -223,9 +223,9 @@ class StoController extends Controller
      */
     public function show(string $id): JsonResponse
     {
-        $sto = Sto::with(['ppa', 'indicator', 'office'])->findOrFail($id);
+        $nra = Nra::with(['ppa', 'indicator', 'office'])->findOrFail($id);
 
-        return response()->json($sto);
+        return response()->json($nra);
     }
 
     /**
@@ -233,13 +233,13 @@ class StoController extends Controller
      */
     public function edit(string $id): JsonResponse
     {
-        $sto = Sto::with(['ppa', 'indicator', 'office'])->findOrFail($id);
-        $ppas = Ppa::where('types_id', 2)->get();
+        $nra = Nra::with(['ppa', 'indicator', 'office'])->findOrFail($id);
+        $ppas = Ppa::where('types_id', 7)->get();
         $indicators = Indicator::all();
         $offices = Office::all();
 
         return response()->json([
-            'sto' => $sto,
+            'nra' => $nra,
             'ppas' => $ppas,
             'indicators' => $indicators,
             'offices' => $offices,
@@ -261,13 +261,13 @@ class StoController extends Controller
             'years' => 'nullable|array',
         ]);
 
-        $sto = Sto::findOrFail($id);
-        $sto->update($request->all());
+        $nra = Nra::findOrFail($id);
+        $nra->update($request->all());
 
         return response()->json([
             'success' => true,
-            'message' => 'STO record updated successfully',
-            'data' => $sto->load(['ppa', 'indicator', 'office']),
+            'message' => 'NRA record updated successfully',
+            'data' => $nra->load(['ppa', 'indicator', 'office']),
         ]);
     }
 
@@ -283,7 +283,7 @@ class StoController extends Controller
         }
 
         $ppas = Ppa::where('record_type_id', $recordTypeId)
-            ->where('types_id', 2) // Only STO PPAs
+            ->where('types_id', 7) // Only NRA PPAs
             ->orderBy('created_at', 'desc')
             ->get(['id', 'name', 'types_id']);
 
@@ -295,12 +295,12 @@ class StoController extends Controller
      */
     public function destroy(string $id): JsonResponse
     {
-        $sto = Sto::findOrFail($id);
-        $sto->delete();
+        $nra = Nra::findOrFail($id);
+        $nra->delete();
 
         return response()->json([
             'success' => true,
-            'message' => 'STO record deleted successfully',
+            'message' => 'NRA record deleted successfully',
         ]);
     }
 }

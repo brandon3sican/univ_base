@@ -5,9 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Sto extends Model
+class Soilcon extends Model
 {
-    protected $table = 'sto';
+    protected $table = 'soilcon';
 
     protected $fillable = [
         'ppa_id',

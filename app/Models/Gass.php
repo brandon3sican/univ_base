@@ -5,10 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Sto extends Model
+class Gass extends Model
 {
-    protected $table = 'sto';
-
+    protected $table = 'gass';
+    
     protected $fillable = [
         'ppa_id',
         'indicator_id',

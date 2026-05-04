@@ -9,6 +9,34 @@ Visual representation of the DENR CAR University Base database structure with re
 
 ```mermaid
 erDiagram
+    %% Laravel System Tables
+    users {
+        bigint id PK
+        string name
+        string email UK
+        timestamp email_verified_at
+        string password
+        string remember_token
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    cache {
+        string key PK
+        text value
+        timestamp expiration
+    }
+    
+    jobs {
+        bigint id PK
+        string queue
+        text payload
+        tinyint attempts
+        tinyint reserved_at
+        tinyint available_at
+        timestamp created_at
+    }
+    
     %% Office Management
     office_types {
         bigint id PK
@@ -70,28 +98,16 @@ erDiagram
         timestamp updated_at
     }
     
-    %% STO System
-    sto_universe {
+    %% Module Tables (all have identical structure)
+    gass {
         bigint id PK
-        json office_ids
-        json values
-        timestamp created_at
-        timestamp updated_at
-    }
-    
-    sto_accomplishments {
-        bigint id PK
-        json office_ids
-        json values
-        json remarks
-        json years
-        timestamp created_at
-        timestamp updated_at
-    }
-    
-    sto_targets {
-        bigint id PK
-        json values
+        bigint ppa_id FK
+        bigint indicator_id FK
+        json office_id
+        json universe
+        json accomplishment
+        json targets
+        text remarks
         json years
         timestamp created_at
         timestamp updated_at
@@ -101,9 +117,82 @@ erDiagram
         bigint id PK
         bigint ppa_id FK
         bigint indicator_id FK
-        json universe_id
-        json accomplishment_id
-        json targets_id
+        json office_id
+        json universe
+        json accomplishment
+        json targets
+        text remarks
+        json years
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    enf {
+        bigint id PK
+        bigint ppa_id FK
+        bigint indicator_id FK
+        json office_id
+        json universe
+        json accomplishment
+        json targets
+        text remarks
+        json years
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    biodiversity {
+        bigint id PK
+        bigint ppa_id FK
+        bigint indicator_id FK
+        json office_id
+        json universe
+        json accomplishment
+        json targets
+        text remarks
+        json years
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    lands {
+        bigint id PK
+        bigint ppa_id FK
+        bigint indicator_id FK
+        json office_id
+        json universe
+        json accomplishment
+        json targets
+        text remarks
+        json years
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    nra {
+        bigint id PK
+        bigint ppa_id FK
+        bigint indicator_id FK
+        json office_id
+        json universe
+        json accomplishment
+        json targets
+        text remarks
+        json years
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    soilcon {
+        bigint id PK
+        bigint ppa_id FK
+        bigint indicator_id FK
+        json office_id
+        json universe
+        json accomplishment
+        json targets
+        text remarks
+        json years
         timestamp created_at
         timestamp updated_at
     }
@@ -115,13 +204,23 @@ erDiagram
     ppa_details ||--o{ ppa_details : "self-reference"
     types ||--o{ ppa : "categorizes"
     indicators ||--o{ ppa : "measures"
-    indicators ||--o{ sto : "tracks"
-    ppa ||--o{ sto : "implements"
     
-    %% STO JSON Relationships
-    sto ||--o{ sto_universe : "via JSON array"
-    sto ||--o{ sto_accomplishments : "via JSON array"
-    sto ||--o{ sto_targets : "via JSON array"
+    %% Module Relationships
+    ppa ||--o{ gass : "implements"
+    ppa ||--o{ sto : "implements"
+    ppa ||--o{ enf : "implements"
+    ppa ||--o{ biodiversity : "implements"
+    ppa ||--o{ lands : "implements"
+    ppa ||--o{ nra : "implements"
+    ppa ||--o{ soilcon : "implements"
+    
+    indicators ||--o{ gass : "tracks"
+    indicators ||--o{ sto : "tracks"
+    indicators ||--o{ enf : "tracks"
+    indicators ||--o{ biodiversity : "tracks"
+    indicators ||--o{ lands : "tracks"
+    indicators ||--o{ nra : "tracks"
+    indicators ||--o{ soilcon : "tracks"
 ```
 
 ---
@@ -139,30 +238,43 @@ flowchart TD
     T[types] --> P
     I[indicators] --> P
     
-    %% STO System
+    %% Module Tables
+    P --> GASS[gass]
     P --> STO[sto]
-    I --> STO
+    P --> ENF[enf]
+    P --> BIO[biodiversity]
+    P --> LAND[lands]
+    P --> NRA[nra]
+    P --> SOIL[soilcon]
     
-    %% STO Data Tables (connected via JSON)
-    STO -.->|universe_id| SU[sto_universe]
-    STO -.->|accomplishment_id| SA[sto_accomplishments]
-    STO -.->|targets_id| ST[sto_targets]
+    I --> GASS
+    I --> STO
+    I --> ENF
+    I --> BIO
+    I --> LAND
+    I --> NRA
+    I --> SOIL
     
     %% JSON Connections
     O -.->|office_id| P
-    O -.->|office_ids| SU
-    O -.->|office_ids| SA
+    O -.->|office_id| GASS
+    O -.->|office_id| STO
+    O -.->|office_id| ENF
+    O -.->|office_id| BIO
+    O -.->|office_id| LAND
+    O -.->|office_id| NRA
+    O -.->|office_id| SOIL
     
     %% Self-reference
     PD --> PD
     
     classDef primary fill:#e1f5fe,stroke:#01579b,stroke-width:2px
     classDef secondary fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
-    classDef sto fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
+    classDef module fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
     
     class OT,O,RT,PD,T,I primary
-    class P,STO secondary
-    class SU,SA,ST sto
+    class P secondary
+    class GASS,STO,ENF,BIO,LAND,NRA,SOIL module
 ```
 
 ---
@@ -198,23 +310,22 @@ graph TB
     PD -->|self-ref| PD
 ```
 
-### 3. STO System Layer
+### 3. Module System Layer
 ```mermaid
 graph LR
-    subgraph STO System
-        STO[sto<br/>Main Records<br/>JSON Arrays]
-        SU[sto_universe<br/>Baseline Data]
-        SA[sto_accomplishments<br/>History Data]
-        ST[sto_targets<br/>Future Data]
+    subgraph Module Tables
+        GASS[gass<br/>GASS Module<br/>JSON Data]
+        STO[sto<br/>STO Module<br/>JSON Data]
+        ENF[enf<br/>ENF Module<br/>JSON Data]
+        BIO[biodiversity<br/>Biodiversity Module<br/>JSON Data]
+        LAND[lands<br/>Lands Module<br/>JSON Data]
+        NRA[nra<br/>NRA Module<br/>JSON Data]
+        SOIL[soilcon<br/>Soil Conservation<br/>JSON Data]
     end
     
-    STO -.->|universe_id| SU
-    STO -.->|accomplishment_id| SA
-    STO -.->|targets_id| ST
-    
-    %% Note about JSON connections
-    note[Note: Connections via JSON arrays<br/>sto.universe_id = [1, 2, 3]<br/>sto.accomplishment_id = [4, 5]<br/>sto.targets_id = [6, 7, 8]]
-    note --> STO
+    %% Note about JSON data structure
+    note[Note: All module tables store<br/>universe, accomplishment,<br/>targets, remarks, years<br/>as JSON fields]
+    note --> GASS
 ```
 
 ---
@@ -229,31 +340,38 @@ graph LR
 }
 ```
 
-### STO Universe
+### Module Office Assignment
 ```json
 {
-  "office_ids": [1, 3, 7],
-  "values": [100, 150, 200],
-  "mapping": "office_ids[i] ↔ values[i]"
+  "office_id": [1, 3, 7],
+  "description": "Array of office IDs for multi-office module records"
 }
 ```
 
-### STO Accomplishments
+### Module Universe Data
 ```json
 {
-  "office_ids": [1, 3, 7],
-  "values": [50, 75, 100],
+  "universe": [100, 150, 200],
+  "office_id": [1, 3, 7],
+  "mapping": "universe[i] ↔ office_id[i]"
+}
+```
+
+### Module Accomplishment Data
+```json
+{
+  "accomplishment": [50, 75, 100],
+  "years": [2022, 2023, 2024],
   "remarks": ["Good", "Excellent", "Needs Improvement"],
-  "years": [2022, 2023, 2024]
+  "office_id": [1, 3, 7]
 }
 ```
 
-### STO Targets
+### Module Target Data
 ```json
 {
-  "values": [120, 180, 250],
-  "years": [2027, 2028, 2029],
-  "mapping": "values[i] ↔ years[i]"
+  "targets": [120, 180, 250],
+  "years": [2027, 2028, 2029]
 }
 ```
 
@@ -299,7 +417,7 @@ graph TD
 
 ---
 
-## STO Calculation Flow
+## Module Calculation Flow
 
 ```mermaid
 flowchart LR
@@ -307,7 +425,7 @@ flowchart LR
     ACC[Accomplishments<br/>2022-2026] -->|sum per office| CALC
     CALC --> BASELINE[Baseline<br/>Universe - Accomplishments]
     
-    BASELINE -->|display| UI[STO Table]
+    BASELINE -->|display| UI[Module Table<br/>(GASS/STO/ENF/etc.)]
     U -->|CAR total| UI
     ACC -->|CAR total| UI
     TARGETS[Target Values<br/>2027+] -->|CAR total| UI
@@ -332,8 +450,23 @@ graph LR
         ppa_details.id --> ppa.ppa_details_id
         types.id --> ppa.types_id
         indicators.id --> ppa.indicator_id
+        
+        %% Module Foreign Keys
+        ppa.id --> gass.ppa_id
         ppa.id --> sto.ppa_id
+        ppa.id --> enf.ppa_id
+        ppa.id --> biodiversity.ppa_id
+        ppa.id --> lands.ppa_id
+        ppa.id --> nra.ppa_id
+        ppa.id --> soilcon.ppa_id
+        
+        indicators.id --> gass.indicator_id
         indicators.id --> sto.indicator_id
+        indicators.id --> enf.indicator_id
+        indicators.id --> biodiversity.indicator_id
+        indicators.id --> lands.indicator_id
+        indicators.id --> nra.indicator_id
+        indicators.id --> soilcon.indicator_id
     end
 ```
 
@@ -342,18 +475,18 @@ graph LR
 graph LR
     subgraph JSON Connections
         offices.id --> ppa.office_id
-        offices.id --> sto_universe.office_ids
-        offices.id --> sto_accomplishments.office_ids
-        
-        %% STO JSON Relationships (corrected)
-        sto_universe.id --> sto.universe_id
-        sto_accomplishments.id --> sto.accomplishment_id
-        sto_targets.id --> sto.targets_id
+        offices.id --> gass.office_id
+        offices.id --> sto.office_id
+        offices.id --> enf.office_id
+        offices.id --> biodiversity.office_id
+        offices.id --> lands.office_id
+        offices.id --> nra.office_id
+        offices.id --> soilcon.office_id
     end
     
     %% Note about JSON array storage
-    note[Note: sto table stores<br/>JSON arrays of IDs<br/>not foreign keys]
-    note --> sto
+    note[Note: Module tables store<br/>JSON data directly<br/>not foreign keys]
+    note --> gass
 ```
 
 ---
@@ -363,6 +496,9 @@ graph LR
 ### Expected Records per Table
 | Table | Estimated Records | Growth Rate |
 |-------|------------------|-------------|
+| users | 10-50 | Low |
+| cache | Variable | High (auto-cleanup) |
+| jobs | Variable | Medium |
 | office_types | 3-5 | Static |
 | offices | 15-20 | Low |
 | record_types | 5 | Static |
@@ -370,10 +506,13 @@ graph LR
 | types | 10-20 | Low |
 | indicators | 200-1000 | High |
 | ppa | 500-2000 | High |
-| sto_universe | 100-300 | Medium |
-| sto_accomplishments | 300-1000 | High |
-| sto_targets | 200-800 | High |
-| sto | 500-2000 | High |
+| gass | 200-800 | High |
+| sto | 200-800 | High |
+| enf | 200-800 | High |
+| biodiversity | 200-800 | High |
+| lands | 200-800 | High |
+| nra | 200-800 | High |
+| soilcon | 200-800 | High |
 
 ---
 
@@ -412,28 +551,44 @@ INDEX (parent_id)
 
 ```mermaid
 graph TD
-    A[office_types] --> B[offices]
-    C[record_types] --> D[ppa_details]
-    E[indicators] --> F[ppa]
-    G[types] --> F
-    D --> F
-    B --> F
-    F --> H[sto]
-    E --> H
+    %% Laravel System Tables
+    U[users] --> C[cache]
+    U --> J[jobs]
     
-    %% STO Data Tables (independent but referenced by sto)
-    I[sto_universe] -.-> H
-    J[sto_accomplishments] -.-> H
-    K[sto_targets] -.-> H
+    %% Foundation Tables
+    OT[office_types] --> O[offices]
+    RT[record_types] --> PD[ppa_details]
+    I[indicators] --> P[ppa]
+    T[types] --> P
+    PD --> P
+    O --> P
     
+    %% Module Tables (independent but depend on PPA and indicators)
+    P --> GASS[gass]
+    P --> STO[sto]
+    P --> ENF[enf]
+    P --> BIO[biodiversity]
+    P --> LAND[lands]
+    P --> NRA[nra]
+    P --> SOIL[soilcon]
+    
+    I --> GASS
+    I --> STO
+    I --> ENF
+    I --> BIO
+    I --> LAND
+    I --> NRA
+    I --> SOIL
+    
+    classDef laravel fill:#ff5722
     classDef base fill:#ffeb3b
     classDef structure fill:#4caf50
-    classDef sto fill:#2196f3
-    classDef sto_data fill:#ff9800
+    classDef module fill:#2196f3
     
-    class A,B,C,D,E,G base
-    class F,H sto
-    class I,J,K sto_data
+    class U,C,J laravel
+    class OT,O,RT,PD,I,T base
+    class P structure
+    class GASS,STO,ENF,BIO,LAND,NRA,SOIL module
 ```
 
 ---
@@ -442,6 +597,12 @@ graph TD
 
 ```mermaid
 graph TB
+    subgraph Laravel System Layer
+        U[Users]
+        C[Cache]
+        J[Jobs]
+    end
+    
     subgraph Foundation Layer
         OT[Office Types]
         O[Offices]
@@ -455,38 +616,54 @@ graph TB
         P[PPA Records]
     end
     
-    subgraph Analytics Layer
-        STO[STO Records]
-        SU[Universe]
-        SA[Accomplishments]
-        ST[Targets]
+    subgraph Module Layer
+        GASS[GASS Module]
+        STO[STO Module]
+        ENF[ENF Module]
+        BIO[Biodiversity Module]
+        LAND[Lands Module]
+        NRA[NRA Module]
+        SOIL[Soil Conservation Module]
     end
     
+    U --> C
+    U --> J
     OT --> O
     RT --> P
     PD --> P
     T --> P
     I --> P
     O --> P
+    P --> GASS
     P --> STO
+    P --> ENF
+    P --> BIO
+    P --> LAND
+    P --> NRA
+    P --> SOIL
+    I --> GASS
     I --> STO
-    STO --> SU
-    STO --> SA
-    STO --> ST
+    I --> ENF
+    I --> BIO
+    I --> LAND
+    I --> NRA
+    I --> SOIL
     
+    classDef laravel fill:#ff5722,stroke:#d84315
     classDef foundation fill:#e3f2fd,stroke:#1976d2
     classDef business fill:#f3e5f5,stroke:#7b1fa2
-    classDef analytics fill:#e8f5e8,stroke:#388e3c
+    classDef module fill:#e8f5e8,stroke:#388e3c
     
+    class U,C,J laravel
     class OT,O,RT,PD,T,I foundation
     class P business
-    class STO,SU,SA,ST analytics
+    class GASS,STO,ENF,BIO,LAND,NRA,SOIL module
 ```
 
 ---
 
-**Created:** March 30, 2026  
-**Database Version:** 2.0  
+**Created:** May 4, 2026  
+**Database Version:** 3.0  
 **Diagram Tool:** Mermaid.js  
-**Total Tables:** 11  
-**Relationships:** 12 Foreign Keys + 4 JSON Arrays
+**Total Tables:** 17  
+**Relationships:** 19 Foreign Keys + 8 JSON Arrays

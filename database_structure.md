@@ -5,6 +5,53 @@ This document outlines the complete database structure for the DENR CAR Universi
 
 ---
 
+## Laravel System Tables
+
+### 1. `users`
+**Purpose:** Laravel authentication system users
+**Created:** 0001_01_01_000000_create_users_table.php
+
+| Column | Type | Constraints | Description |
+|--------|------|------------|-------------|
+| id | BIGINT (Primary) | Auto-increment | Unique identifier |
+| name | VARCHAR | | User name |
+| email | VARCHAR | UNIQUE | User email |
+| email_verified_at | TIMESTAMP | NULLABLE | Email verification timestamp |
+| password | VARCHAR | | Hashed password |
+| remember_token | VARCHAR | NULLABLE | "Remember me" token |
+| created_at | TIMESTAMP | | Creation timestamp |
+| updated_at | TIMESTAMP | | Last update timestamp |
+
+---
+
+### 2. `cache`
+**Purpose:** Laravel cache system
+**Created:** 0001_01_01_000001_create_cache_table.php
+
+| Column | Type | Constraints | Description |
+|--------|------|------------|-------------|
+| key | VARCHAR (Primary) | | Cache key |
+| value | TEXT | | Cached data |
+| expiration | INT | | Expiration timestamp |
+
+---
+
+### 3. `jobs`
+**Purpose:** Laravel queue system jobs
+**Created:** 0001_01_01_000002_create_jobs_table.php
+
+| Column | Type | Constraints | Description |
+|--------|------|------------|-------------|
+| id | BIGINT (Primary) | Auto-increment | Unique identifier |
+| queue | VARCHAR | | Queue name |
+| payload | LONGTEXT | | Job data |
+| attempts | TINYINT | | Number of attempts |
+| reserved_at | INT | NULLABLE | Reservation timestamp |
+| available_at | INT | | Available timestamp |
+| created_at | TIMESTAMP | | Creation timestamp |
+
+---
+
 ## Core Tables
 
 ### 1. `office_types`
@@ -134,80 +181,30 @@ This document outlines the complete database structure for the DENR CAR Universi
 
 ---
 
-## STO (Strategic Targets and Outcomes) System Tables
+## Module Tables (All Have Identical Structure)
 
-### 8. `sto_universe`
-**Purpose:** Stores universe values for STO calculations
-**Created:** 2026_03_11_054512_create_sto_universe_table.php
-
-| Column | Type | Constraints | Description |
-|--------|------|------------|-------------|
-| id | BIGINT (Primary) | Auto-increment | Unique identifier |
-| office_ids | JSON | NULLABLE | Array of office IDs |
-| values | JSON | NULLABLE | Array of corresponding universe values |
-| created_at | TIMESTAMP | | Creation timestamp |
-| updated_at | TIMESTAMP | | Last update timestamp |
-
-**JSON Structure:**
-```json
-{
-  "office_ids": [1, 3, 7],
-  "values": [100, 150, 200]
-}
-```
-
----
-
-### 9. `sto_accomplishments`
-**Purpose:** Stores accomplishment data by year and office
-**Created:** 2026_03_11_054411_create_sto_accomplishments_table.php
+### 8. `gass` (GASS Module)
+**Purpose:** GASS (General Administrative Support Services) module data
+**Created:** 2026_03_11_054513_create_gass.php
 
 | Column | Type | Constraints | Description |
 |--------|------|------------|-------------|
 | id | BIGINT (Primary) | Auto-increment | Unique identifier |
-| office_ids | JSON | NULLABLE | Array of office IDs |
-| values | JSON | NULLABLE | Array of accomplishment values |
-| remarks | JSON | NULLABLE | Array of remarks for each office |
-| years | JSON | NULLABLE | Array of years (2022-2026) |
+| ppa_id | BIGINT (Foreign) | `ppa(id)` ON DELETE SET NULL NULLABLE | Reference to PPA |
+| indicator_id | BIGINT (Foreign) | `indicators(id)` ON DELETE SET NULL NULLABLE | Reference to indicator |
+| office_id | JSON | NULLABLE | Array of office IDs |
+| universe | JSON | NULLABLE | Array of universe values |
+| accomplishment | JSON | NULLABLE | Array of accomplishment values |
+| targets | JSON | NULLABLE | Array of target values |
+| remarks | TEXT | NULLABLE | Remarks text |
+| years | JSON | NULLABLE | Array of years |
 | created_at | TIMESTAMP | | Creation timestamp |
 | updated_at | TIMESTAMP | | Last update timestamp |
 
-**JSON Structure:**
-```json
-{
-  "office_ids": [1, 3, 7],
-  "values": [50, 75, 100],
-  "remarks": ["Good", "Excellent", "Needs Improvement"],
-  "years": [2022, 2023, 2024]
-}
-```
-
 ---
 
-### 10. `sto_targets`
-**Purpose:** Stores future target values by year
-**Created:** 2026_03_11_054214_create_sto_targets_table.php
-
-| Column | Type | Constraints | Description |
-|--------|------|------------|-------------|
-| id | BIGINT (Primary) | Auto-increment | Unique identifier |
-| values | JSON | NULLABLE | Array of target values |
-| years | JSON | NULLABLE | Array of target years (2027+) |
-| created_at | TIMESTAMP | | Creation timestamp |
-| updated_at | TIMESTAMP | | Last update timestamp |
-
-**JSON Structure:**
-```json
-{
-  "values": [120, 180, 250],
-  "years": [2027, 2028, 2029]
-}
-```
-
----
-
-### 11. `sto` (Main STO Records)
-**Purpose:** Main table linking PPAs with STO data
+### 9. `sto` (STO Module)
+**Purpose:** STO (Strategic Targets and Outcomes) module data
 **Created:** 2026_03_11_054513_create_sto_table.php
 
 | Column | Type | Constraints | Description |
@@ -215,77 +212,205 @@ This document outlines the complete database structure for the DENR CAR Universi
 | id | BIGINT (Primary) | Auto-increment | Unique identifier |
 | ppa_id | BIGINT (Foreign) | `ppa(id)` ON DELETE SET NULL NULLABLE | Reference to PPA |
 | indicator_id | BIGINT (Foreign) | `indicators(id)` ON DELETE SET NULL NULLABLE | Reference to indicator |
-| universe_id | JSON | NULLABLE | Array of universe record IDs |
-| accomplishment_id | JSON | NULLABLE | Array of accomplishment record IDs |
-| targets_id | JSON | NULLABLE | Array of target record IDs |
+| office_id | JSON | NULLABLE | Array of office IDs |
+| universe | JSON | NULLABLE | Array of universe values |
+| accomplishment | JSON | NULLABLE | Array of accomplishment values |
+| targets | JSON | NULLABLE | Array of target values |
+| remarks | TEXT | NULLABLE | Remarks text |
+| years | JSON | NULLABLE | Array of years |
 | created_at | TIMESTAMP | | Creation timestamp |
 | updated_at | TIMESTAMP | | Last update timestamp |
 
-**Relationships:**
-- Belongs to: `ppa`, `indicators`
-- Has many (via JSON): `sto_universe`, `sto_accomplishments`, `sto_targets`
+---
 
-**JSON Fields:**
-- `universe_id`: Array of references to `sto_universe` records
-- `accomplishment_id`: Array of references to `sto_accomplishments` records  
-- `targets_id`: Array of references to `sto_targets` records
+### 10. `enf` (ENF Module)
+**Purpose:** ENF (Environmental and Natural Resources) module data
+**Created:** 2026_04_28_073958_enf.php
+
+| Column | Type | Constraints | Description |
+|--------|------|------------|-------------|
+| id | BIGINT (Primary) | Auto-increment | Unique identifier |
+| ppa_id | BIGINT (Foreign) | `ppa(id)` ON DELETE SET NULL NULLABLE | Reference to PPA |
+| indicator_id | BIGINT (Foreign) | `indicators(id)` ON DELETE SET NULL NULLABLE | Reference to indicator |
+| office_id | JSON | NULLABLE | Array of office IDs |
+| universe | JSON | NULLABLE | Array of universe values |
+| accomplishment | JSON | NULLABLE | Array of accomplishment values |
+| targets | JSON | NULLABLE | Array of target values |
+| remarks | TEXT | NULLABLE | Remarks text |
+| years | JSON | NULLABLE | Array of years |
+| created_at | TIMESTAMP | | Creation timestamp |
+| updated_at | TIMESTAMP | | Last update timestamp |
+
+---
+
+### 11. `biodiversity` (Biodiversity Module)
+**Purpose:** Biodiversity conservation module data
+**Created:** 2026_04_29_010257_biodiversity.php
+
+| Column | Type | Constraints | Description |
+|--------|------|------------|-------------|
+| id | BIGINT (Primary) | Auto-increment | Unique identifier |
+| ppa_id | BIGINT (Foreign) | `ppa(id)` ON DELETE SET NULL NULLABLE | Reference to PPA |
+| indicator_id | BIGINT (Foreign) | `indicators(id)` ON DELETE SET NULL NULLABLE | Reference to indicator |
+| office_id | JSON | NULLABLE | Array of office IDs |
+| universe | JSON | NULLABLE | Array of universe values |
+| accomplishment | JSON | NULLABLE | Array of accomplishment values |
+| targets | JSON | NULLABLE | Array of target values |
+| remarks | TEXT | NULLABLE | Remarks text |
+| years | JSON | NULLABLE | Array of years |
+| created_at | TIMESTAMP | | Creation timestamp |
+| updated_at | TIMESTAMP | | Last update timestamp |
+
+---
+
+### 12. `lands` (Lands Module)
+**Purpose:** Lands management module data
+**Created:** 2026_04_29_010257_lands.php
+
+| Column | Type | Constraints | Description |
+|--------|------|------------|-------------|
+| id | BIGINT (Primary) | Auto-increment | Unique identifier |
+| ppa_id | BIGINT (Foreign) | `ppa(id)` ON DELETE SET NULL NULLABLE | Reference to PPA |
+| indicator_id | BIGINT (Foreign) | `indicators(id)` ON DELETE SET NULL NULLABLE | Reference to indicator |
+| office_id | JSON | NULLABLE | Array of office IDs |
+| universe | JSON | NULLABLE | Array of universe values |
+| accomplishment | JSON | NULLABLE | Array of accomplishment values |
+| targets | JSON | NULLABLE | Array of target values |
+| remarks | TEXT | NULLABLE | Remarks text |
+| years | JSON | NULLABLE | Array of years |
+| created_at | TIMESTAMP | | Creation timestamp |
+| updated_at | TIMESTAMP | | Last update timestamp |
+
+---
+
+### 13. `nra` (NRA Module)
+**Purpose:** NRA (Natural Resources Assessment) module data
+**Created:** 2026_04_29_053143_create_nra_table.php
+
+| Column | Type | Constraints | Description |
+|--------|------|------------|-------------|
+| id | BIGINT (Primary) | Auto-increment | Unique identifier |
+| ppa_id | BIGINT (Foreign) | `ppa(id)` ON DELETE SET NULL NULLABLE | Reference to PPA |
+| indicator_id | BIGINT (Foreign) | `indicators(id)` ON DELETE SET NULL NULLABLE | Reference to indicator |
+| office_id | JSON | NULLABLE | Array of office IDs |
+| universe | JSON | NULLABLE | Array of universe values |
+| accomplishment | JSON | NULLABLE | Array of accomplishment values |
+| targets | JSON | NULLABLE | Array of target values |
+| remarks | TEXT | NULLABLE | Remarks text |
+| years | JSON | NULLABLE | Array of years |
+| created_at | TIMESTAMP | | Creation timestamp |
+| updated_at | TIMESTAMP | | Last update timestamp |
+
+---
+
+### 14. `soilcon` (Soil Conservation Module)
+**Purpose:** Soil conservation module data
+**Created:** 2026_04_29_053642_soilcon.php
+
+| Column | Type | Constraints | Description |
+|--------|------|------------|-------------|
+| id | BIGINT (Primary) | Auto-increment | Unique identifier |
+| ppa_id | BIGINT (Foreign) | `ppa(id)` ON DELETE SET NULL NULLABLE | Reference to PPA |
+| indicator_id | BIGINT (Foreign) | `indicators(id)` ON DELETE SET NULL NULLABLE | Reference to indicator |
+| office_id | JSON | NULLABLE | Array of office IDs |
+| universe | JSON | NULLABLE | Array of universe values |
+| accomplishment | JSON | NULLABLE | Array of accomplishment values |
+| targets | JSON | NULLABLE | Array of target values |
+| remarks | TEXT | NULLABLE | Remarks text |
+| years | JSON | NULLABLE | Array of years |
+| created_at | TIMESTAMP | | Creation timestamp |
+| updated_at | TIMESTAMP | | Last update timestamp |
+
+**Module JSON Structure:**
+```json
+{
+  "office_id": [1, 3, 7],
+  "universe": [100, 150, 200],
+  "accomplishment": [50, 75, 100],
+  "targets": [120, 180, 250],
+  "years": [2022, 2023, 2024, 2027, 2028],
+  "remarks": "General remarks for the record"
+}
+```
 
 ---
 
 ## Relationships Diagram
 
 ```
+Laravel System:
+users → cache
+users → jobs
+
+Office Management:
 office_types
     ↓ (1:N)
 offices
     ↓ (via JSON)
-ppa ← sto_universe
+ppa ← gass
     ↓ (1:N)      ↓ (via JSON)
-sto ← sto_accomplishments ← ppa_details
+sto ← enf ← ppa_details
     ↓ (via JSON) ↓ (via JSON)
-sto_targets ← indicators
-    ↓ (via JSON)
-record_types
-    ↓ (1:N)
-ppa ← types
+biodiversity ← indicators
+lands ← record_types
+nra ← types
+soilcon
+
+PPA Structure:
+ppa_details (self-reference)
+record_types → ppa
+types → ppa
+indicators → ppa
+offices → ppa (via JSON)
+
+Module Structure:
+ppa → gass, sto, enf, biodiversity, lands, nra, soilcon
+indicators → gass, sto, enf, biodiversity, lands, nra, soilcon
+offices → all modules (via JSON office_id)
 ```
 
 ## Data Flow
 
-1. **Office Setup:**
+1. **Laravel System:**
+   - `users` provides authentication
+   - `cache` stores application cache
+   - `jobs` handles background tasks
+
+2. **Office Setup:**
    - `office_types` defines office categories
    - `offices` stores individual offices with type references
 
-2. **PPA Hierarchy:**
-   - `record_types` defines hierarchy levels (1-5)
+3. **PPA Hierarchy:**
+   - `record_types` defines hierarchy levels (1-6)
    - `ppa_details` provides nested structure
    - `ppa` links everything together with office assignments
 
-3. **STO System:**
-   - `sto_universe` stores baseline values per office
-   - `sto_accomplishments` tracks yearly achievements
-   - `sto_targets` defines future goals
-   - `sto` connects PPAs with all STO data
+4. **Module System:**
+   - All 7 modules (gass, sto, enf, biodiversity, lands, nra, soilcon) have identical structure
+   - Each module stores universe, accomplishment, targets as JSON fields
+   - Modules link PPAs with indicators and office assignments
 
 ## Key Features
 
 ### JSON Arrays for Multi-Office Support
 - `ppa.office_id`: [1, 3, 7] - Single PPA can span multiple offices
-- `sto_universe.office_ids` & `values`: Parallel arrays for office-specific data
-- `sto_accomplishments`: Similar structure with years and remarks
+- Module `office_id`: [1, 3, 7] - Single module record can span multiple offices
+- Module JSON fields store parallel arrays for office-specific data
 
 ### Hierarchical Numbering System
-- Record types 1-5 generate automatic numbering:
+- Record types 1-6 generate automatic numbering:
   - 1: PROGRAM → I., II., III.
   - 2: PROJECT → A., B., C.
   - 3: MAIN ACTIVITY → 1., 2., 3.
   - 4: SUB-ACTIVITY → 1.1., 1.2., 1.3.
   - 5: SUB-SUB-ACTIVITY → 1.1.1., 1.1.2., 1.1.3.
+  - 6: ACTIONABLE TASK → 1.1.1.1., 1.1.1.2., 1.1.1.3.
 
-### STO Calculations
+### Module Calculations
 - **Baseline Formula:** `universe - sum(accomplishments 2022-2026)`
 - **CAR Totals:** Summed across all offices for each metric
 - **Year Separation:** Past years (2022-2025) vs Current year (2026) vs Future years (2027+)
+- **Parent Activity Validation:** Record types 4, 5, 6 require parent activity selection
 
 ## Color Coding System
 - **PROGRAM:** #14423f (Dark Green)
@@ -298,13 +423,29 @@ ppa ← types
 ---
 
 ## Migration Order
-1. `office_types` → `offices`
-2. `record_types` → `ppa_details`
-3. `indicators` → `types`
-4. `ppa`
-5. `sto_universe` → `sto_accomplishments` → `sto_targets` → `sto`
+1. **Laravel System Tables:**
+   - `users` → `cache` → `jobs`
+
+2. **Foundation Tables:**
+   - `office_types` → `offices`
+   - `record_types` → `ppa_details`
+   - `indicators` → `types`
+
+3. **Business Logic:**
+   - `ppa`
+
+4. **Module Tables (independent, can run in parallel):**
+   - `gass`
+   - `sto`
+   - `enf`
+   - `biodiversity`
+   - `lands`
+   - `nra`
+   - `soilcon`
 
 ---
 
-**Last Updated:** March 30, 2026
-**Version:** 2.0
+**Last Updated:** May 4, 2026
+**Version:** 3.0
+**Total Tables:** 17
+**Module Tables:** 7 (all identical structure)

@@ -105,7 +105,7 @@
                 </div>
 
                 <button type="submit"
-                    class="btn-login w-full flex justify-center items-center py-3 px-4 rounded-lg text-white font-medium focus:outline-none hover:shadow-xl focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                    class="btn-login w-full flex justify-center items-center py-3 px-4 rounded-lg text-white font-medium hover:shadow-xl hover:border-3 hover:border-white">
                     <i class="fas fa-sign-in-alt mr-2"></i>
                     Sign In
                 </button>
