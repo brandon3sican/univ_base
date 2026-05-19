@@ -21,6 +21,7 @@ class Nra extends Model
     ];
 
     protected $casts = [
+        'office_id' => 'array',
         'universe' => 'array',
         'accomplishment' => 'array',
         'targets' => 'array',
@@ -35,10 +36,5 @@ class Nra extends Model
     public function indicator(): BelongsTo
     {
         return $this->belongsTo(Indicator::class);
-    }
-
-    public function office(): BelongsTo
-    {
-        return $this->belongsTo(Office::class);
     }
 }

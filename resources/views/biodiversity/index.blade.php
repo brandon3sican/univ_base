@@ -1,10 +1,37 @@
 @extends('layouts.app')
 
 @php
-    $pageTitle = 'Biodiversity';
+    $pageTitle = 'BIODIVERSITY';
 @endphp
 
 @section('content')
+    <style>
+        .table-container {
+            max-height: 70vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .thead-clone {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 20;
+            background: linear-gradient(to bottom, #f9fafb, #e5e7eb);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .thead-clone table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        .thead-clone th {
+            background: linear-gradient(to bottom, #f9fafb, #e5e7eb);
+        }
+    </style>
+
     <!-- Data Table Container -->
     <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
         <!-- Table Header with Summary Statistics -->
@@ -12,7 +39,7 @@
             <div class="flex items-center justify-between">
                 <div class="flex items-center">
                     <i class="fas fa-table mr-2"></i>
-                    <h2 class="text-lg font-bold">Biodiversity Data Table</h2>
+                    <h2 class="text-lg font-bold">BIODIVERSITY Data Table</h2>
                 </div>
                 <div class="flex items-center space-x-3">
                     <!-- Toggle Actions Column Button -->
@@ -32,11 +59,11 @@
         </div>
 
         <!-- Table Container -->
-        <div class="overflow-x-auto" style="max-height: 70vh; overflow-y: auto;">
+        <div class="table-container overflow-x-auto">
             <table class="w-full border-collapse border-2 border-gray-400 shadow-lg rounded-lg overflow-hidden">
                 <!-- Table Head -->
-                <thead
-                    class="sticky top-0 z-10 bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700 shadow-md border-b border-gray-300">
+                <thead class="bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700 shadow-md border-b border-gray-300"
+                    id="original-thead">
                     <!-- First row: main headers -->
                     <tr class="border-b border-gray-300">
                         <th rowspan="2"
@@ -193,9 +220,83 @@
     document.addEventListener('DOMContentLoaded', function() {
         loadBiodiversityData();
         loadFormData();
+        initStickyHeader();
     });
 
-    // Load Biodiversity data for the table
+    // Sticky header functionality
+    function initStickyHeader() {
+        const tableContainer = document.querySelector('.table-container');
+        const originalThead = document.getElementById('original-thead');
+        const originalTable = originalThead.closest('table');
+
+        if (!tableContainer || !originalThead || !originalTable) return;
+
+        // Clone the thead
+        const clonedThead = originalThead.cloneNode(true);
+        clonedThead.id = 'cloned-thead';
+
+        // Create container for cloned header
+        const headerClone = document.createElement('div');
+        headerClone.className = 'thead-clone';
+        headerClone.style.display = 'none';
+
+        // Create table for cloned header
+        const clonedTable = document.createElement('table');
+        clonedTable.className = 'w-full border-collapse border-2 border-gray-400 shadow-lg rounded-lg overflow-hidden';
+        clonedTable.appendChild(clonedThead);
+
+        headerClone.appendChild(clonedTable);
+        tableContainer.appendChild(headerClone);
+
+        // Function to sync column widths
+        function syncColumnWidths() {
+            const originalThs = originalThead.querySelectorAll('th');
+            const clonedThs = clonedThead.querySelectorAll('th');
+
+            originalThs.forEach((originalTh, index) => {
+                if (clonedThs[index]) {
+                    const computedStyle = window.getComputedStyle(originalTh);
+                    clonedThs[index].style.width = computedStyle.width;
+                    clonedThs[index].style.minWidth = computedStyle.minWidth;
+                    clonedThs[index].style.maxWidth = computedStyle.maxWidth;
+                    clonedThs[index].style.padding = computedStyle.padding;
+                    clonedThs[index].style.margin = computedStyle.margin;
+                }
+            });
+
+            // Sync table width
+            const originalTableWidth = originalTable.offsetWidth;
+            clonedTable.style.width = originalTableWidth + 'px';
+        }
+
+        // Initial sync
+        setTimeout(syncColumnWidths, 100);
+
+        // Sync on window resize
+        window.addEventListener('resize', syncColumnWidths);
+
+        // Handle scroll
+        tableContainer.addEventListener('scroll', function() {
+            const scrollTop = tableContainer.scrollTop;
+            const theadHeight = originalThead.offsetHeight;
+
+            if (scrollTop > theadHeight) {
+                headerClone.style.display = 'block';
+                headerClone.style.top = scrollTop + 'px';
+                syncColumnWidths(); // Resync when showing
+            } else {
+                headerClone.style.display = 'none';
+            }
+        });
+
+        // Handle horizontal scroll
+        tableContainer.addEventListener('scroll', function() {
+            const scrollLeft = tableContainer.scrollLeft;
+            headerClone.style.transform = `translateX(${-scrollLeft}px)`;
+        });
+    }
+
+    // Load BIODIVERSITY data for the table
     function loadBiodiversityData() {
         fetch('/biodiversity', {
                 headers: {
@@ -207,12 +308,12 @@
             .then(data => {
                 renderTable(data);
             })
-            .catch(error => console.error('Error loading Biodiversity data:', error));
+            .catch(error => console.error('Error loading BIODIVERSITY data:', error));
     }
 
     // Load form data (PPAs and Indicators)
     function loadFormData() {
-        fetch('/biodiversity/create', {
+        return fetch('/biodiversity/create', {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
@@ -225,8 +326,12 @@
                 offices = data.offices;
                 recordTypes = data.recordTypes;
                 populateSelects();
+                return data; // Return data for promise chaining
             })
-            .catch(error => console.error('Error loading form data:', error));
+            .catch(error => {
+                console.error('Error loading form data:', error);
+                throw error; // Re-throw to be caught by caller
+            });
     }
 
     // Populate select dropdowns
@@ -246,10 +351,10 @@
             recordTypeSelect.innerHTML = '<option value="">Select Record Type</option>';
         }
 
-        // Add PPA options (only Biodiversity PPAs - types_id = 4)
+        // Add PPA options (only BIODIVERSITY PPAs - types_id = 4)
         if (ppaSelect) {
             ppas.forEach(ppa => {
-                // Only show PPAs that belong to Biodiversity (types_id = 4)
+                // Only show PPAs that belong to BIODIVERSITY (types_id = 4)
                 if (ppa.types_id === 4) {
                     const option = document.createElement('option');
                     option.value = ppa.id;
@@ -305,6 +410,12 @@
             if (parentActivitySelect) {
                 parentActivitySelect.addEventListener('change', updateButtonVisibility);
             }
+
+            // Add event listener for new PPA name textarea
+            const newPpaTextarea = document.getElementById('new_ppa_name');
+            if (newPpaTextarea) {
+                newPpaTextarea.addEventListener('input', updateButtonVisibility);
+            }
             // Initially hide office section and set button visibility
             const officeSection = document.getElementById('officeSection');
             if (officeSection) {
@@ -344,6 +455,21 @@
         const saveBtn = document.getElementById('saveBtn');
         const step2Section = document.getElementById('step2Section');
 
+        // Force show save button in edit mode
+        const isEditMode = currentEditId !== null;
+        if (isEditMode && saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-gray-400');
+            saveBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+            saveBtn.classList.remove('hidden');
+
+            // Hide Next button in edit mode
+            if (nextBtn) {
+                nextBtn.classList.add('hidden');
+            }
+            return; // Exit early for edit mode
+        }
+
         if (recordType && ppaSelect && indicator && nextBtn && saveBtn) {
             const isRecordTypeValid = recordType.value.trim() !== '';
             const isPpaValid = (ppaSelect.value.trim() !== '' && ppaSelect.value !== 'new') ||
@@ -354,7 +480,7 @@
             let isParentActivityRequired = false;
             let isParentActivityValid = true;
 
-            if (selectedRecordType == '4' || selectedRecordType == '5' || selectedRecordType == '6') {
+            if (selectedRecordType == '2' || selectedRecordType == '3' || selectedRecordType == '4') {
                 isParentActivityRequired = true;
                 isParentActivityValid = parentActivitySelect && parentActivitySelect.value.trim() !== '';
             }
@@ -363,21 +489,9 @@
             const selectedOffices = document.querySelectorAll('input[name="office_id[]"]:checked').length;
             const hasOfficeSelection = selectedOffices > 0;
 
-
             // Check if Record Type AND PPA are valid, AND Parent Activity if required
             if (!isRecordTypeValid || !isPpaValid || (isParentActivityRequired && !isParentActivityValid)) {
-                // Lock BOTH Save and Next buttons - disable them
-                saveBtn.disabled = true;
-                saveBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                saveBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-                saveBtn.classList.add('bg-gray-400');
-
-                nextBtn.disabled = true;
-                nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                nextBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
-                nextBtn.classList.add('bg-gray-400');
-
-                // Hide both buttons
+                // Basic requirements not met - hide both buttons
                 saveBtn.classList.add('hidden');
                 nextBtn.classList.add('hidden');
 
@@ -386,40 +500,68 @@
                     step2Section.classList.add('hidden');
                 }
             } else {
-                // Record Type AND PPA are valid - enable Save button by default
-                saveBtn.disabled = false;
-                saveBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-                saveBtn.classList.remove('bg-gray-400');
-                saveBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                // Hide Step 2 by default
+                if (step2Section) {
+                    step2Section.classList.add('hidden');
+                }
 
-                if (hasIndicator) {
-                    // Has indicator content - check office selection
-                    if (hasOfficeSelection) {
-                        // Has offices - enable Next button, hide Save
+                if (hasIndicator && hasOfficeSelection) {
+                    // Both indicator and office filled - check if we're in edit mode with step2 visible
+                    const isEditMode = currentEditId !== null;
+                    const isStep2Visible = step2Section && !step2Section.classList.contains('hidden');
+
+                    if (isEditMode && isStep2Visible) {
+                        // Edit mode with step2 visible - show Save button
+                        saveBtn.disabled = false;
+                        saveBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-gray-400');
+                        saveBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                        saveBtn.classList.remove('hidden');
+
+                        // Hide Next button
+                        nextBtn.classList.add('hidden');
+                    } else {
+                        // Create mode or step2 not visible - show Next button
+                        saveBtn.classList.add('hidden');
+
+                        // Enable Next button
                         nextBtn.disabled = false;
-                        nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-                        nextBtn.classList.remove('bg-gray-400');
+                        nextBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-gray-400');
                         nextBtn.classList.add('bg-green-600', 'hover:bg-green-700');
                         nextBtn.classList.remove('hidden');
-                        saveBtn.classList.add('hidden');
-                    } else {
-                        // No offices selected - disable Next button, hide Save
-                        nextBtn.disabled = true;
-                        nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                        nextBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
-                        nextBtn.classList.add('bg-gray-400');
-                        nextBtn.classList.remove('hidden');
-                        saveBtn.classList.add('hidden');
                     }
+                } else if (hasIndicator && !hasOfficeSelection) {
+                    // Indicator filled but no office - disable Next button
+
+                    // Hide Save button when indicator is filled
+                    saveBtn.classList.add('hidden');
+
+                    // Disable Next button until office is selected
+                    nextBtn.disabled = true;
+                    nextBtn.classList.add('opacity-50', 'cursor-not-allowed', 'bg-gray-400');
+                    nextBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                    nextBtn.classList.remove('hidden');
+                } else if (!hasIndicator && hasOfficeSelection) {
+                    // Office selected but no indicator - disable Next button
+
+                    // Hide Save button when office is selected
+                    saveBtn.classList.add('hidden');
+
+                    // Disable Next button until indicator is filled
+                    nextBtn.disabled = true;
+                    nextBtn.classList.add('opacity-50', 'cursor-not-allowed', 'bg-gray-400');
+                    nextBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                    nextBtn.classList.remove('hidden');
                 } else {
-                    // No indicator content - show Save button, hide Next (everything else is optional)
-                    nextBtn.classList.add('hidden');
+                    // Neither indicator nor office filled - show Save button
+
+                    // Show Save button
+                    saveBtn.disabled = false;
+                    saveBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-gray-400');
+                    saveBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
                     saveBtn.classList.remove('hidden');
 
-                    // Hide Step 2 if it's currently visible
-                    if (step2Section) {
-                        step2Section.classList.add('hidden');
-                    }
+                    // Hide Next button when neither is filled
+                    nextBtn.classList.add('hidden');
                 }
             }
         }
@@ -570,6 +712,58 @@
         });
     }
 
+    // Keep Step 2 tables in sync with office selections (preserve typed values)
+    function captureStep2InputValues() {
+        const values = {};
+        const selectors = [
+            '#step2Section input[name^="universe["]',
+            '#step2Section input[name^="accomplishment["]',
+            '#step2Section input[name^="targets["]'
+        ];
+        document.querySelectorAll(selectors.join(',')).forEach(input => {
+            values[input.name] = input.value;
+        });
+        return values;
+    }
+
+    function restoreStep2InputValues(values) {
+        Object.keys(values).forEach(name => {
+            const safeName = name.replace(/"/g, '\\"');
+            const input = document.querySelector(`#step2Section input[name="${safeName}"]`);
+            if (input) input.value = values[name];
+        });
+    }
+
+    function syncUniverseDataWithSelectedOffices() {
+        const step2Section = document.getElementById('step2Section');
+        if (!step2Section || step2Section.classList.contains('hidden')) return;
+
+        const cachedValues = captureStep2InputValues();
+
+        // Capture existing additional period tables
+        const additionalContainer = document.getElementById('additionalPeriodsContainer');
+        const existingPeriods = [];
+        if (additionalContainer) {
+            additionalContainer.querySelectorAll('[id^="table_"]').forEach(div => {
+                const period = div.id.replace('table_', '').replace(/_/g, '-');
+                existingPeriods.push(period);
+            });
+        }
+
+        // Rebuild default table
+        generateUniverseTable();
+
+        // Rebuild additional period tables
+        existingPeriods.forEach(period => {
+            const tableId = `table_${period.replace('-', '_')}`;
+            const existing = document.getElementById(tableId);
+            if (existing) existing.remove();
+            generatePeriodTable(period, false);
+        });
+
+        restoreStep2InputValues(cachedValues);
+    }
+
     // Filter PPA dropdown based on selected record type
     function filterPpaByRecordType() {
         const recordTypeSelect = document.getElementById('record_type_id');
@@ -595,9 +789,30 @@
         fetch(`/api/biodiversity/ppas?record_type_id=${selectedRecordTypeId}`)
             .then(response => response.json())
             .then(data => {
-                // Add filtered PPAs to dropdown (only Biodiversity PPAs - types_id = 4)
-                data.forEach(ppa => {
-                    // Only show PPAs that belong to Biodiversity (types_id = 4)
+                // Handle both array and object data formats
+                let ppaArray = [];
+
+                if (Array.isArray(data)) {
+                    // Data is already an array
+                    ppaArray = data;
+                } else if (typeof data === 'object' && data !== null) {
+                    // Convert object to array (API returns object with numeric keys)
+                    ppaArray = Object.values(data);
+                } else {
+                    console.error('Expected array or object but received:', typeof data, data);
+                    loadingMessage.textContent = 'Invalid data format received';
+                    loadingMessage.classList.add('text-red-500');
+                    setTimeout(() => {
+                        loadingMessage.classList.add('hidden');
+                        loadingMessage.classList.remove('text-red-500');
+                        loadingMessage.textContent = 'Loading PPAs for selected record type...';
+                    }, 3000);
+                    return;
+                }
+
+                // Add filtered PPAs to dropdown (only BIODIVERSITY PPAs - types_id = 4)
+                ppaArray.forEach(ppa => {
+                    // Only show PPAs that belong to BIODIVERSITY (types_id = 4)
                     if (ppa.types_id === 4) {
                         const option = document.createElement('option');
                         option.value = ppa.id;
@@ -636,10 +851,8 @@
         const step2Section = document.getElementById('step2Section');
         if (step2Section && !step2Section.classList.contains('hidden')) {
             updateButtonVisibility();
-            // If Step 2 is visible, regenerate tables
-            if (selectAllCheckbox.checked) {
-                generateUniverseTable();
-            }
+            // If Step 2 is visible, regenerate tables for current office selection
+            syncUniverseDataWithSelectedOffices();
         }
     }
 
@@ -664,6 +877,9 @@
 
             // Update button visibility for office selection validation
             updateButtonVisibility();
+
+            // If Step 2 is visible, update tables automatically
+            syncUniverseDataWithSelectedOffices();
         }
     });
 
@@ -755,6 +971,7 @@
                 // Normal row - show all data separately
                 const bgClass = isProgram ? 'bg-green-50' : '';
                 row.className = `hover:bg-gray-50 transition-colors ${bgClass}`;
+
                 row.innerHTML = `
                     <td class="px-3 py-2 text-sm text-gray-900">
                         ${!isConsecutiveDuplicate ? getIndentedPPAName(item) : ''}
@@ -1085,11 +1302,14 @@
                 const carTotal = values.reduce((sum, val) => sum + (parseFloat(val) || 0), 0);
 
                 // Create display array: CAR total first (green), then individual values
-                const displayValues = [`<span class="text-green-600 font-semibold">${carTotal}</span>`];
+                const displayValues = [
+                    `<span class="text-green-600 font-semibold">${carTotal === 0 ? '-' : carTotal}</span>`
+                ];
 
                 // Add individual office values
                 Object.values(universe).forEach(val => {
-                    displayValues.push(val.toString());
+                    const numVal = parseFloat(val) || 0;
+                    displayValues.push(numVal === 0 ? '-' : val.toString());
                 });
 
                 return displayValues.join('<br>');
@@ -1147,14 +1367,12 @@
                 let tooltipContent = '';
 
                 if (officeAccomplishment && typeof officeAccomplishment === 'object') {
-                    // Get current year value or sum past years only
-                    const currentValue = officeAccomplishment[currentYear];
+                    // Sum past years only for the Past Years column
                     const pastYearsSum = pastYears.reduce((sum, year) => {
                         return sum + (officeAccomplishment[year] || 0);
                     }, 0);
 
-                    value = index === 0 ? pastYearsSum : (currentValue !== null && currentValue !== undefined ?
-                        currentValue : pastYearsSum);
+                    value = pastYearsSum;
 
                     // Create tooltip content for past years
                     const officeName = offices.find(o => o.id == officeId)?.name || `Office ${officeId}`;
@@ -1197,12 +1415,12 @@
 
             // Create display array: CAR total first (green), then individual accomplishments with tooltips
             const displayValues = [
-                `<span class="text-green-600 font-semibold cursor-help hover:text-green-700" data-tooltip="${encodeURIComponent(carTooltip)}">${carTotalAccomplishment}</span>`
+                `<span class="text-green-600 font-semibold cursor-help hover:text-green-700" data-tooltip="${encodeURIComponent(carTooltip)}">${carTotalAccomplishment === 0 ? '-' : carTotalAccomplishment}</span>`
             ];
 
             officeAccomplishments.forEach((val, index) => {
                 displayValues.push(
-                    `<span class="cursor-help hover:text-gray-700" data-tooltip="${encodeURIComponent(officeTooltips[index])}">${val}</span>`
+                    `<span class="cursor-help hover:text-gray-700" data-tooltip="${encodeURIComponent(officeTooltips[index])}">${val === 0 ? '-' : val}</span>`
                 );
             });
 
@@ -1212,7 +1430,9 @@
         return '0';
     }
 
-    // Calculate baseline (universe value - total accomplishment value) with CAR total first
+    // Calculate baseline with formula:
+    // Baseline = Universe - (current accomplishment + past accomplishment)
+    // If past/current aggregates are missing, fallback to summing year values.
     function calculateBaseline(universe, accomplishment, officeIds) {
         if (!universe || !accomplishment) return '0';
 
@@ -1257,27 +1477,47 @@
             const officeAccomplishment = accomplishment[officeId];
 
             if (officeAccomplishment && typeof officeAccomplishment === 'object') {
-                // Sum all accomplishment years for this office
-                const allYears = Object.values(officeAccomplishment).filter(val => typeof val === 'number');
-                const totalAccomplishment = allYears.reduce((acc, val) => acc + val, 0);
+                // Prefer using the computed aggregates (to avoid double-counting years)
+                let totalAccomplishment = 0;
+                const hasAggregates =
+                    typeof officeAccomplishment.past_years === 'number' ||
+                    typeof officeAccomplishment.current_year === 'number';
+
+                if (hasAggregates) {
+                    totalAccomplishment =
+                        (typeof officeAccomplishment.past_years === 'number' ? officeAccomplishment.past_years :
+                            0) +
+                        (typeof officeAccomplishment.current_year === 'number' ? officeAccomplishment
+                            .current_year : 0);
+                } else {
+                    // Fallback: sum numeric year values only (ignore any non-year keys)
+                    const yearValues = Object.entries(officeAccomplishment)
+                        .filter(([key, val]) => /^\d{4}$/.test(String(key)) && typeof val === 'number')
+                        .map(([, val]) => val);
+                    totalAccomplishment = yearValues.reduce((acc, val) => acc + val, 0);
+                }
 
                 const baseline = universeValue - totalAccomplishment;
-                baselineValues.push(baseline);
-                carTotalBaseline += baseline;
+                const adjustedBaseline = baseline < 0 ? 0 : baseline;
+                baselineValues.push(adjustedBaseline);
+                carTotalBaseline += adjustedBaseline;
             } else {
                 const baseline = universeValue;
-                baselineValues.push(baseline);
-                carTotalBaseline += baseline;
+                const adjustedBaseline = baseline < 0 ? 0 : baseline;
+                baselineValues.push(adjustedBaseline);
+                carTotalBaseline += adjustedBaseline;
             }
         });
 
         // Create display array: CAR total first (green/red based on value), then individual baselines
         const carColorClass = carTotalBaseline < 0 ? 'text-red-600' : 'text-green-600';
-        const displayValues = [`<span class="${carColorClass} font-semibold">${carTotalBaseline}</span>`];
+        const displayValues = [
+            `<span class="${carColorClass} font-semibold">${carTotalBaseline === 0 ? '-' : carTotalBaseline}</span>`
+        ];
 
         baselineValues.forEach(val => {
             const colorClass = val < 0 ? 'text-red-600' : 'text-blue-600';
-            displayValues.push(`<span class="${colorClass}">${val}</span>`);
+            displayValues.push(`<span class="${colorClass}">${val === 0 ? '-' : val}</span>`);
         });
 
         return displayValues.length > 0 ? displayValues.join('<br>') : '0';
@@ -1329,8 +1569,10 @@
         });
 
         // Create display array: CAR total first (green), then individual current year values
-        const displayValues = [`<span class="text-green-600 font-semibold">${carTotalCurrentYear}</span>`];
-        currentYearValues.forEach(val => displayValues.push(val.toString()));
+        const displayValues = [
+            `<span class="text-green-600 font-semibold">${carTotalCurrentYear === 0 ? '-' : carTotalCurrentYear}</span>`
+        ];
+        currentYearValues.forEach(val => displayValues.push(val === 0 ? '-' : val.toString()));
 
         return displayValues.length > 0 ? displayValues.join('<br>') : '0';
     }
@@ -1457,9 +1699,9 @@
             .map(checkbox => parseInt(checkbox.value));
         data.office_id = checkedOffices.length > 0 ? checkedOffices : null;
 
-        // Handle universe data (only if Step 2 is shown)
-        const step2Section = document.getElementById('step2Section');
-        if (step2Section && !step2Section.classList.contains('hidden')) {
+        // Handle universe data (only if data section is shown)
+        const dataSection = document.getElementById('dataSection');
+        if (dataSection && !dataSection.classList.contains('hidden')) {
             // Collect universe data (single value per office for entire duration)
             const universeInputs = document.querySelectorAll('input[name^="universe"]');
             const universeData = {};
@@ -1540,10 +1782,10 @@
 
             data.targets = targetsData;
 
-            // Handle remarks
-            const remarks = document.getElementById('remarks');
-            if (remarks) {
-                data.remarks = remarks.value.trim();
+            // Handle single remarks field
+            const remarksTextarea = document.getElementById('remarks');
+            if (remarksTextarea) {
+                data.remarks = remarksTextarea.value.trim();
             }
         } else {
             // Step 2 not shown - set other fields to null
@@ -1570,7 +1812,7 @@
             }
 
             // Add types_id for new PPA creation (required field in PPA table)
-            submitFormData.append('types_id', '1'); // Default type - controller can adjust if needed
+            submitFormData.append('types_id', '4'); // BIODIVERSITY type
 
             // Add ppa_details_id (nullable, can be set by controller)
             submitFormData.append('ppa_details_id', ''); // Empty for now
@@ -1653,25 +1895,43 @@
         submitFormData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute(
             'content'));
 
-        const url = currentEditId ? `/biodiversity/${currentEditId}` : '/biodiversity';
-        const method = currentEditId ? 'POST' :
-            'POST'; // Use POST for both, Laravel will handle method spoofing
+        // Add edit section for edit mode
+        if (currentEditId) {
+            // Prefer explicit selection, but auto-detect based on visible section
+            const selectedSection = document.querySelector('input[name="editSection"]:checked');
+            if (selectedSection) {
+                submitFormData.append('editSection', selectedSection.value);
+            } else {
+                const ppaDetailsSection = document.getElementById('ppaDetailsSection');
+                const dataSection = document.getElementById('dataSection');
+                const isDataVisible = dataSection && !dataSection.classList.contains('hidden');
+                const isPpaVisible = ppaDetailsSection && !ppaDetailsSection.classList.contains('hidden');
 
-        // Add method spoofing for PUT requests
+                // If user is viewing data section (or both), treat this as data edit.
+                if (isDataVisible && !isPpaVisible) {
+                    submitFormData.append('editSection', 'data');
+                } else {
+                    submitFormData.append('editSection', 'ppa');
+                }
+            }
+        }
+
+        const url = currentEditId ? `/biodiversity/${currentEditId}` : '/biodiversity';
+        // IMPORTANT: Use POST + _method for updates so PHP parses multipart FormData.
+        const method = 'POST';
+
         if (currentEditId) {
             submitFormData.append('_method', 'PUT');
         }
 
-        // Debug: Log all FormData entries
-        console.log('=== FormData Debug ===');
-        for (let [key, value] of submitFormData.entries()) {
-            console.log(`${key}: ${value}`);
-        }
-        console.log('=== End FormData Debug ===');
-
         fetch(url, {
                 method: method,
-                body: submitFormData
+                body: submitFormData,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                        'content'),
+                    'Accept': 'application/json'
+                }
             })
             .then(response => {
                 // Check if response is actually JSON
@@ -1681,7 +1941,6 @@
                 } else {
                     // If not JSON, throw an error with the response text
                     return response.text().then(text => {
-                        console.error('Non-JSON Response:', text);
                         throw new Error(
                             `Server returned non-JSON response: ${text.substring(0, 200)}...`
                         );
@@ -1691,8 +1950,11 @@
             .then(data => {
                 if (data.success) {
                     closeModal();
-                    loadBiodiversityData();
                     showNotification(data.message, 'success');
+                    // Ensure UI reflects saved DB state
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 300);
                 } else {
                     // Handle validation errors specifically
                     let errorMessage = data.message || 'Unknown error';
@@ -1720,17 +1982,40 @@
         currentEditId = id;
 
         // Fetch the record data
-        fetch(`/biodiversity/${id}/edit`)
-            .then(response => response.json())
+        fetch(`/biodiversity/${id}/edit`, {
+                headers: {
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => {
+                const contentType = response.headers.get('content-type') || '';
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(
+                            `Server error (${response.status}). ${text.substring(0, 200)}...`
+                        );
+                    });
+                }
+                if (!contentType.includes('application/json')) {
+                    return response.text().then(text => {
+                        throw new Error(
+                            `Server returned non-JSON response: ${text.substring(0, 200)}...`
+                        );
+                    });
+                }
+                return response.json();
+            })
             .then(data => {
+                // Store data globally for office-specific population
+                window.editData = data;
+
                 // Populate form fields with the record data
                 const record = data.biodiversity;
-                const ppas = data.ppas || [];
+                const officeData = data.office_data || {};
 
-                // Set basic fields
-                document.getElementById('modalTitle').textContent = 'Edit Biodiversity Record';
-                document.getElementById('record_type_id').value = record.record_type_id || '';
-                document.getElementById('indicator_id').value = record.indicator_id || '';
+                // Set basic fields (except dropdowns that need to be populated first)
+                document.getElementById('modalTitle').textContent = 'Edit BIODIVERSITY Record';
+                document.getElementById('indicator_id').value = record.indicator ? record.indicator.name : '';
 
                 // Show modal first
                 document.getElementById('crudModal').classList.remove('hidden');
@@ -1738,15 +2023,77 @@
                 document.getElementById('crudModal').classList.add('items-center');
                 document.getElementById('crudModal').classList.add('justify-center');
 
+                // Show edit section selector and hide sections initially
+                document.getElementById('editSectionSelector').classList.remove('hidden');
+                document.getElementById('editMode').value = 'true';
+                document.getElementById('ppaDetailsSection').classList.add('hidden');
+                document.getElementById('dataSection').classList.add('hidden');
+
+                // Reset section selection
+                document.querySelectorAll('input[name="editSection"]').forEach(radio => radio.checked = false);
+
                 // Load form data to populate dropdowns
                 loadFormData().then(() => {
-                    // After dropdowns are populated, set the PPA value
+                    // After dropdowns are populated, set the values
                     setTimeout(() => {
+                        // Set record type after dropdown is populated
+                        document.getElementById('record_type_id').value = record.ppa ? record.ppa
+                            .record_type_id : '';
+
+                        // Set PPA value
                         document.getElementById('ppa_id').value = record.ppa_id || '';
 
                         // Handle PPA selection
                         if (record.ppa_id) {
                             handlePpaSelection();
+                        }
+
+                        // Select offices that have data
+                        const officeIds = Object.keys(officeData);
+                        console.log('Office data:', officeData);
+                        console.log('Office IDs:', officeIds);
+
+                        // Get current record's office IDs - this is the primary source
+                        let currentRecordOfficeIds = [];
+                        if (record.office_id) {
+                            try {
+                                currentRecordOfficeIds = Array.isArray(record.office_id) ? record
+                                    .office_id : JSON.parse(record.office_id);
+                            } catch (e) {
+                                console.log('Error parsing office_id:', e);
+                            }
+                        }
+                        console.log('Current record office IDs:', currentRecordOfficeIds);
+
+                        // Use current record's office IDs as the primary source
+                        // Only fall back to officeData if current record has no office IDs
+                        const allOfficeIds = currentRecordOfficeIds.length > 0 ?
+                            currentRecordOfficeIds : officeIds;
+                        console.log('Final office IDs to select:', allOfficeIds);
+
+                        allOfficeIds.forEach(officeId => {
+                            const checkbox = document.getElementById(`office_${officeId}`);
+                            if (checkbox) {
+                                checkbox.checked = true;
+                            }
+                        });
+
+                        // Always show step 2 section if there are offices selected
+                        const checkedOffices = Array.from(document.querySelectorAll(
+                            'input[name="office_id[]"]:checked'));
+
+                        if (checkedOffices.length > 0) {
+                            const step2Section = document.getElementById('step2Section');
+                            if (step2Section) {
+                                step2Section.classList.remove('hidden');
+                            }
+                            generateUniverseTable();
+
+                            // Populate office-specific data after tables are generated
+                            setTimeout(() => {
+                                populateOfficeSpecificData(officeData);
+                                updateButtonVisibility();
+                            }, 200);
                         }
 
                         // Update button visibility
@@ -1755,9 +2102,96 @@
                 });
             })
             .catch(error => {
-                console.error('Error loading Biodiversity data:', error);
+                console.error('Error loading BIODIVERSITY data:', error);
                 showNotification('Error loading record data', 'error');
             });
+    }
+
+    // Populate office-specific data in the form
+    function populateOfficeSpecificData(officeData) {
+        Object.keys(officeData).forEach(officeId => {
+            const data = officeData[officeId];
+
+            // Populate universe value
+            const universeInput = document.querySelector(`input[name="universe[${officeId}]"]`);
+            if (universeInput && data.universe) {
+                let universeValue = data.universe;
+                // Handle legacy JSON string or casted object
+                if (typeof universeValue === 'string') {
+                    try {
+                        universeValue = JSON.parse(universeValue);
+                    } catch (e) {
+                        universeValue = {};
+                    }
+                }
+                if (universeValue && typeof universeValue === 'object') {
+                    universeInput.value = universeValue[officeId] ?? '';
+                } else {
+                    universeInput.value = universeValue ?? '';
+                }
+            }
+
+            // Populate accomplishment and targets for each year
+            let accomplishmentValue = data.accomplishment;
+            console.log(`Raw accomplishment for office ${officeId}:`, accomplishmentValue);
+            if (typeof accomplishmentValue === 'string') {
+                try {
+                    accomplishmentValue = JSON.parse(accomplishmentValue);
+                } catch (e) {
+                    console.error('Error parsing accomplishment:', e);
+                    accomplishmentValue = null;
+                }
+            }
+            console.log(`Parsed accomplishment for office ${officeId}:`, accomplishmentValue);
+            if (accomplishmentValue && typeof accomplishmentValue === 'object') {
+                // Structure is {officeId: {year: value}}
+                const officeData = accomplishmentValue[officeId];
+                if (officeData && typeof officeData === 'object') {
+                    Object.keys(officeData).forEach(year => {
+                        const yearValue = officeData[year];
+                        const accompInput = document.querySelector(
+                            `input[name="accomplishment[${officeId}][${year}]"]`);
+                        if (accompInput) {
+                            accompInput.value = yearValue ?? '';
+                            console.log(`Set accomplishment[${officeId}][${year}] = ${yearValue}`);
+                        }
+                    });
+                }
+            }
+
+            let targetsValue = data.targets;
+            console.log(`Raw targets for office ${officeId}:`, targetsValue);
+            if (typeof targetsValue === 'string') {
+                try {
+                    targetsValue = JSON.parse(targetsValue);
+                } catch (e) {
+                    console.error('Error parsing targets:', e);
+                    targetsValue = null;
+                }
+            }
+            console.log(`Parsed targets for office ${officeId}:`, targetsValue);
+            if (targetsValue && typeof targetsValue === 'object') {
+                // Structure is {officeId: {year: value}}
+                const officeData = targetsValue[officeId];
+                if (officeData && typeof officeData === 'object') {
+                    Object.keys(officeData).forEach(year => {
+                        const yearValue = officeData[year];
+                        const targetInput = document.querySelector(
+                            `input[name="targets[${officeId}][${year}]"]`);
+                        if (targetInput) {
+                            targetInput.value = yearValue ?? '';
+                            console.log(`Set targets[${officeId}][${year}] = ${yearValue}`);
+                        }
+                    });
+                }
+            }
+
+            // Populate single remarks field (use remarks from first office with data)
+            const remarksTextarea = document.getElementById('remarks');
+            if (remarksTextarea && data.remarks && !remarksTextarea.value) {
+                remarksTextarea.value = data.remarks || '';
+            }
+        });
     }
 
     // Delete record
@@ -1776,24 +2210,17 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    closeDeleteModal();
+                    closeModal();
                     loadBiodiversityData();
-                    showNotification(data.message, 'success');
+                    showNotification('Record deleted successfully!', 'success');
+                    closeDeleteModal();
                 } else {
-                    showNotification('Error occurred', 'error');
+                    showNotification(data.message || 'Error deleting record', 'error');
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
-                showNotification('Error occurred', 'error');
+                showNotification('Error occurred: ' + error.message, 'error');
             });
-    }
-
-    // Modal functions
-    function closeModal() {
-        document.getElementById('crudModal').classList.add('hidden');
-        document.getElementById('crudForm').reset();
-        currentEditId = null;
     }
 
     function closeDeleteModal() {
@@ -1891,8 +2318,9 @@
             parentActivitySection.classList.remove('hidden');
             loadParentActivities(recordTypeName);
 
-            // Show required indicator for record types 4, 5, 6
-            if (selectedRecordType == '4' || selectedRecordType == '5' || selectedRecordType == '6') {
+            // Show required indicator for record types 2, 3, 4, 5, 6
+            if (selectedRecordType == '2' || selectedRecordType == '3' || selectedRecordType == '4' ||
+                selectedRecordType == '5' || selectedRecordType == '6') {
                 parentActivityRequired.classList.remove('hidden');
             } else {
                 parentActivityRequired.classList.add('hidden');
@@ -1944,7 +2372,8 @@
 
         // Filter PPAs based on parent record type ID (more reliable)
         const parentActivities = ppas.filter(ppa => {
-            console.log('Checking PPA:', ppa.name, 'record_type_id:', ppa.record_type_id, 'vs parent ID:',
+            console.log('Checking PPA:', ppa.name, 'record_type_id:', ppa.record_type_id,
+                'vs parent ID:',
                 parentRecordTypeId);
             return ppa.record_type_id == parentRecordTypeId;
         });
@@ -2011,32 +2440,28 @@
     function loadPpas() {
         // PPAs are already loaded globally from the initial page load
         // This function can be used to refresh PPA data if needed
-        console.log('PPAs already loaded:', ppas);
     }
 
     // Load indicators for modal
     function loadIndicators() {
         // Indicators are already loaded globally from the initial page load
         // This function can be used to refresh indicator data if needed
-        console.log('Indicators already loaded:', indicators);
     }
 
     // Load types for modal
     function loadTypes() {
         // Types data would be loaded here if needed
-        console.log('Types loading placeholder');
     }
 
     // Load PPA details for modal
     function loadPpaDetails() {
         // PPA details data would be loaded here if needed
-        console.log('PPA details loading placeholder');
     }
 
     // Open create modal
     function openCreateModal() {
         currentEditId = null;
-        document.getElementById('modalTitle').textContent = 'Add New Biodiversity Record';
+        document.getElementById('modalTitle').textContent = 'Add New BIODIVERSITY Record';
         document.getElementById('crudForm').reset();
         clearDynamicFields();
         document.getElementById('crudModal').classList.remove('hidden');
@@ -2044,9 +2469,18 @@
         document.getElementById('crudModal').classList.add('items-center');
         document.getElementById('crudModal').classList.add('justify-center');
 
+        // Hide edit section selector (create mode)
+        document.getElementById('editSectionSelector').classList.add('hidden');
+        document.getElementById('editMode').value = 'false';
+
+        // Show all sections for create mode
+        document.getElementById('ppaDetailsSection').classList.remove('hidden');
+        document.getElementById('dataSection').classList.remove('hidden');
+
         // Reset parent activity section
         document.getElementById('parentActivitySection').classList.add('hidden');
-        document.getElementById('parent_activity_id').innerHTML = '<option value="">Select Parent Activity</option>';
+        document.getElementById('parent_activity_id').innerHTML =
+            '<option value="">Select Parent Activity</option>';
 
         updateButtonVisibility();
         loadOffices();
@@ -2063,7 +2497,6 @@
         const selectedRecordType = recordTypeSelect.value;
 
         if (!selectedRecordType) {
-            console.log('No record type selected for refresh');
             return;
         }
 
@@ -2088,11 +2521,9 @@
                     ppas = data.ppas; // Update the global ppas array with fresh data
                     indicators = data.indicators;
                     recordTypes = data.recordTypes;
-                    console.log('Fresh PPAs loaded:', ppas);
                     loadParentActivities(recordTypeName);
                 })
                 .catch(error => {
-                    console.error('Error refreshing PPAs:', error);
                     // Show error message in the dropdown
                     const parentActivitySelect = document.getElementById('parent_activity_id');
                     const loadingMessage = document.getElementById('parentLoadingMessage');
@@ -2100,6 +2531,37 @@
                     loadingMessage.classList.add('hidden');
                 });
         }
+    }
+
+    // Close modal function
+    function closeModal() {
+        document.getElementById('crudModal').classList.add('hidden');
+        document.getElementById('crudModal').classList.remove('flex');
+        document.getElementById('crudModal').classList.remove('items-center');
+        document.getElementById('crudModal').classList.remove('justify-center');
+        currentEditId = null;
+        clearDynamicFields();
+        document.getElementById('crudForm').reset();
+    }
+
+    // Edit section selection functions
+    function selectEditSection(section) {
+        // Update radio button
+        document.getElementById('editSection' + section.charAt(0).toUpperCase() + section.slice(1)).checked = true;
+
+        // Hide all sections first
+        document.getElementById('ppaDetailsSection').classList.add('hidden');
+        document.getElementById('dataSection').classList.add('hidden');
+
+        // Show selected section
+        if (section === 'ppa') {
+            document.getElementById('ppaDetailsSection').classList.remove('hidden');
+        } else if (section === 'data') {
+            document.getElementById('dataSection').classList.remove('hidden');
+        }
+
+        updateButtonVisibility();
+        document.getElementById('saveBtn').disabled = false; // Enable the save button
     }
 
     // Initialize tooltips when page loads

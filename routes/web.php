@@ -1,13 +1,13 @@
 <?php
 
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\BiodiversityController;
 use App\Http\Controllers\EnfController;
 use App\Http\Controllers\GassController;
 use App\Http\Controllers\LandsController;
-use App\Http\Controllers\BiodiversityController;
-use App\Http\Controllers\StoController;
-use App\Http\Controllers\SoilconController;
 use App\Http\Controllers\NraController;
+use App\Http\Controllers\SoilconController;
+use App\Http\Controllers\StoController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['web'])->group(function () {

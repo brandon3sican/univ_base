@@ -2,14 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Enf extends Model
 {
-    use HasFactory;
-
     protected $table = 'enf';
 
     protected $fillable = [
@@ -19,8 +16,8 @@ class Enf extends Model
         'universe',
         'accomplishment',
         'targets',
-        'remarks',
         'years',
+        'remarks',
     ];
 
     protected $casts = [
@@ -39,10 +36,5 @@ class Enf extends Model
     public function indicator(): BelongsTo
     {
         return $this->belongsTo(Indicator::class);
-    }
-
-    public function office(): BelongsTo
-    {
-        return $this->belongsTo(Office::class);
     }
 }

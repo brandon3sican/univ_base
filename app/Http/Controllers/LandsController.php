@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Indicator;
 use App\Models\Lands;
+use App\Models\Indicator;
 use App\Models\Office;
 use App\Models\Ppa;
 use App\Models\RecordType;
@@ -19,7 +19,7 @@ class LandsController extends Controller
      */
     public function index()
     {
-        $lands = Lands::with(['ppa.recordType', 'indicator', 'office'])->get();
+        $lands = Lands::with(['ppa.recordType', 'indicator'])->get();
 
         if (request()->expectsJson()) {
             return response()->json($lands);
@@ -175,15 +175,16 @@ class LandsController extends Controller
             $landsData = [
                 'ppa_id' => $ppaId,
                 'indicator_id' => $indicatorId,
-                'office_id' => $officeId ? json_encode($officeId) : null,
-                'universe' => $universeValue ? json_encode($universeValue) : null, // Store office->value structure as JSON
-                'accomplishment' => $accomplishment ? json_encode($accomplishment) : null,
-                'targets' => $targets ? json_encode($targets) : null,
-                'years' => $years ? json_encode($years) : null,
+                // These are JSON columns; model casts handle encoding/decoding.
+                'office_id' => $officeId ?: null,
+                'universe' => $universeValue ?: null, // office->value structure
+                'accomplishment' => $accomplishment ?: null,
+                'targets' => $targets ?: null,
+                'years' => $years ?: null,
                 'remarks' => $request->remarks,
             ];
 
-            // Debug: Log data being saved
+            // Debug: Log the data being saved
             \Log::info('LANDS Data to be saved:', $landsData);
             \Log::info('Universe type: '.gettype($universe));
             \Log::info('Universe value: '.var_export($universe, true));
@@ -193,7 +194,7 @@ class LandsController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'LANDS record created successfully',
-                'data' => $lands->load(['ppa', 'indicator', 'office']),
+                'data' => $lands->load(['ppa', 'indicator']),
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             \Log::error('Validation Error: '.$e->getMessage());
@@ -223,7 +224,7 @@ class LandsController extends Controller
      */
     public function show(string $id): JsonResponse
     {
-        $lands = Lands::with(['ppa', 'indicator', 'office'])->findOrFail($id);
+        $lands = Lands::with(['ppa', 'indicator'])->findOrFail($id);
 
         return response()->json($lands);
     }
@@ -233,13 +234,46 @@ class LandsController extends Controller
      */
     public function edit(string $id): JsonResponse
     {
-        $lands = Lands::with(['ppa', 'indicator', 'office'])->findOrFail($id);
+        $lands = Lands::with(['ppa', 'indicator'])->findOrFail($id);
         $ppas = Ppa::where('types_id', 5)->get();
         $indicators = Indicator::all();
         $offices = Office::all();
 
+        // Get all related LANDS records for the same PPA
+        $relatedLandsRecords = Lands::with(['ppa', 'indicator'])
+            ->where('ppa_id', $lands->ppa_id)
+            ->get();
+
+        // Group data by office for easier frontend processing
+        $officeData = [];
+        foreach ($relatedLandsRecords as $record) {
+            // Handle JSON office_id field
+            $officeIds = $record->office_id;
+            if (is_string($officeIds)) {
+                $officeIds = json_decode($officeIds, true);
+            }
+            $officeIds = $officeIds ?: [];
+
+            foreach ($officeIds as $officeId) {
+                $office = Office::find($officeId);
+                if ($office) {
+                    $officeData[$officeId] = [
+                        'id' => $record->id,
+                        'universe' => $record->universe,
+                        'accomplishment' => $record->accomplishment,
+                        'targets' => $record->targets,
+                        'years' => $record->years,
+                        'remarks' => $record->remarks,
+                        'office_name' => $office->name,
+                    ];
+                }
+            }
+        }
+
         return response()->json([
             'lands' => $lands,
+            'related_records' => $relatedLandsRecords,
+            'office_data' => $officeData,
             'ppas' => $ppas,
             'indicators' => $indicators,
             'offices' => $offices,
@@ -251,24 +285,199 @@ class LandsController extends Controller
      */
     public function update(Request $request, string $id): JsonResponse
     {
-        $request->validate([
-            'ppa_id' => 'nullable|exists:ppa,id',
-            'indicator_id' => 'nullable|exists:indicators,id',
-            'office_id' => 'nullable|exists:offices,id',
-            'universe' => 'nullable|array',
-            'accomplishment' => 'nullable|array',
-            'targets' => 'nullable|array',
-            'years' => 'nullable|array',
-        ]);
+        try {
+            $request->validate([
+                'ppa_id' => 'nullable|exists:ppa,id',
+                'new_ppa_name' => 'nullable|string',
+                'record_type_id' => 'nullable|required_with:new_ppa_name|integer|min:1',
+                'types_id' => 'nullable|required_with:new_ppa_name|integer|min:1',
+                'ppa_details_id' => 'nullable',
+                'ppa_office_id' => 'nullable',
+                'indicator_id' => 'nullable|exists:indicators,id',
+                'indicator_text' => 'nullable|string',
+                // Frontend submits these as JSON strings via FormData (same as store()).
+                'office_id' => 'nullable',
+                'universe' => 'nullable',
+                'accomplishment' => 'nullable',
+                'targets' => 'nullable',
+                'years' => 'nullable',
+                'remarks' => 'nullable|string',
+                'editSection' => 'nullable|in:ppa,data',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors(),
+            ], 422);
+        }
 
-        $lands = Lands::findOrFail($id);
-        $lands->update($request->all());
+        try {
+            // Find the existing record
+            $existingLands = Lands::findOrFail($id);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'LANDS record updated successfully',
-            'data' => $lands->load(['ppa', 'indicator', 'office']),
-        ]);
+            $editSection = $request->input('editSection');
+            if (! $editSection) {
+                // If the client didn't send editSection, infer it from the payload
+                $hasDataPayload = $request->hasAny([
+                    'office_id', 'universe', 'accomplishment', 'targets', 'years', 'remarks',
+                ]);
+                $editSection = $hasDataPayload ? 'data' : 'ppa';
+            }
+
+            // Get current data
+            $currentData = [
+                'ppa_id' => $existingLands->ppa_id,
+                'indicator_id' => $existingLands->indicator_id,
+                // These are JSON columns with casts; keep as arrays.
+                'office_id' => $existingLands->office_id ?? [],
+                'universe' => $existingLands->universe ?? [],
+                'accomplishment' => $existingLands->accomplishment ?? [],
+                'targets' => $existingLands->targets ?? [],
+                'years' => $existingLands->years ?? [],
+                'remarks' => $existingLands->remarks,
+            ];
+
+            // If indicator text is provided, treat it as an edit to the indicator itself.
+            // Prefer updating the existing indicator row (if present) instead of creating duplicates.
+            // Frontend should send indicator_text, but some forms may still send "indicator".
+            $indicatorText = trim((string) ($request->input('indicator_text') ?? $request->input('indicator') ?? ''));
+            if ($indicatorText !== '') {
+                if ($existingLands->indicator_id) {
+                    Indicator::whereKey($existingLands->indicator_id)->update(['name' => $indicatorText]);
+                    $currentData['indicator_id'] = $existingLands->indicator_id;
+                } else {
+                    $indicator = Indicator::create(['name' => $indicatorText]);
+                    $currentData['indicator_id'] = $indicator->id;
+                }
+            } elseif ($request->filled('indicator_id')) {
+                // Allow switching to an existing indicator by id.
+                $currentData['indicator_id'] = (int) $request->input('indicator_id');
+            }
+
+            // Handle PPA Details section update
+            if ($editSection === 'ppa') {
+                // Handle PPA creation if new PPA is provided
+                $ppaId = $request->input('ppa_id');
+                if ($request->filled('new_ppa_name')) {
+                    // Handle ppa_office_id
+                    $ppaOfficeId = $request->input('ppa_office_id');
+                    if (is_string($ppaOfficeId)) {
+                        $ppaOfficeId = json_decode($ppaOfficeId, true) ?? [];
+                    }
+                    if (is_array($ppaOfficeId) && empty($ppaOfficeId)) {
+                        $ppaOfficeId = null;
+                    }
+
+                    // Handle ppa_details_id
+                    $ppaDetailsId = $request->input('ppa_details_id');
+                    if (empty($ppaDetailsId)) {
+                        $ppaDetails = \App\Models\PpaDetails::create([
+                            'parent_id' => null,
+                            'column_order' => 0,
+                        ]);
+                        $ppaDetailsId = $ppaDetails->id;
+                    }
+
+                    $ppa = Ppa::create([
+                        'name' => $request->new_ppa_name,
+                        'record_type_id' => $request->record_type_id,
+                        'types_id' => $request->types_id ?? 5,
+                        'ppa_details_id' => $ppaDetailsId,
+                        'office_id' => $ppaOfficeId,
+                        'indicator_id' => null,
+                    ]);
+                    $ppaId = $ppa->id;
+                }
+
+                // Update only PPA-related fields
+                $currentData['ppa_id'] = $ppaId ?? $currentData['ppa_id'];
+            }
+
+            // Handle Office Assignment & Data section update
+            if ($editSection === 'data') {
+                // Frontend submits these as JSON strings. Decode if needed.
+                $officeIds = $request->input('office_id', $currentData['office_id']);
+                if (is_string($officeIds)) {
+                    $officeIds = json_decode($officeIds, true);
+                }
+                $officeIds = $officeIds ?: [];
+
+                $universeData = $request->input('universe', $currentData['universe']);
+                if (is_string($universeData)) {
+                    $universeData = json_decode($universeData, true);
+                }
+                $universeData = $universeData ?: [];
+
+                $accomplishmentData = $request->input('accomplishment', $currentData['accomplishment']);
+                if (is_string($accomplishmentData)) {
+                    $accomplishmentData = json_decode($accomplishmentData, true);
+                }
+                $accomplishmentData = $accomplishmentData ?: [];
+
+                $targetsData = $request->input('targets', $currentData['targets']);
+                if (is_string($targetsData)) {
+                    $targetsData = json_decode($targetsData, true);
+                }
+                $targetsData = $targetsData ?: [];
+
+                $yearsData = $request->input('years', $currentData['years']);
+                if (is_string($yearsData)) {
+                    $yearsData = json_decode($yearsData, true);
+                }
+                $yearsData = $yearsData ?: [];
+
+                $remarks = $request->input('remarks', $currentData['remarks']);
+
+                // Update only data-related fields
+                $currentData['office_id'] = $officeIds;
+                $currentData['universe'] = $universeData;
+                $currentData['accomplishment'] = $accomplishmentData;
+                $currentData['targets'] = $targetsData;
+                $currentData['years'] = $yearsData;
+                $currentData['remarks'] = $remarks;
+            }
+
+            // Update the existing record with merged data
+            $updateData = [
+                'ppa_id' => $currentData['ppa_id'],
+                'indicator_id' => $currentData['indicator_id'],
+                // JSON columns; model casts handle encoding/decoding.
+                'office_id' => $currentData['office_id'],
+                'universe' => $currentData['universe'],
+                'accomplishment' => $currentData['accomplishment'],
+                'targets' => $currentData['targets'],
+                'years' => $currentData['years'],
+                'remarks' => $currentData['remarks'],
+            ];
+
+            // Debug: Log what we're trying to update
+            error_log("LANDS UPDATE - ID: $id, Section: $editSection");
+            error_log('LANDS UPDATE - Data: '.json_encode($updateData));
+
+            try {
+                $result = $existingLands->update($updateData);
+                if (! $result) {
+                    throw new \Exception('Update returned false (no changes persisted)');
+                }
+                error_log('LANDS UPDATE - Result: SUCCESS');
+                error_log('LANDS UPDATE - Updated record: '.json_encode($existingLands->fresh()->toArray()));
+            } catch (\Exception $updateException) {
+                error_log('LANDS UPDATE - Update Exception: '.$updateException->getMessage());
+                throw $updateException;
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'LANDS record updated successfully',
+                'data' => $existingLands->load(['ppa', 'indicator']),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating record: '.$e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
