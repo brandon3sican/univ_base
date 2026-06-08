@@ -2,12 +2,14 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\BiodiversityController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EnfController;
 use App\Http\Controllers\GassController;
 use App\Http\Controllers\LandsController;
 use App\Http\Controllers\NraController;
 use App\Http\Controllers\SoilconController;
 use App\Http\Controllers\StoController;
+use App\Http\Controllers\UserManagementController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['web'])->group(function () {
@@ -29,9 +31,8 @@ Route::middleware(['web'])->group(function () {
     Route::get('/api/nra/ppas', [NraController::class, 'getPpasByRecordType']);
 
     Route::middleware(['auth'])->group(function () {
-        Route::get('/dashboard', function () {
-            return view('dashboard.index');
-        })->name('dashboard');
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/dashboard/search', [DashboardController::class, 'search'])->name('dashboard.search');
 
         // GASS Routes
         Route::get('/gass', [GassController::class, 'index'])->name('gass.index');
@@ -95,5 +96,13 @@ Route::middleware(['web'])->group(function () {
         Route::get('/nra/{id}/edit', [NraController::class, 'edit'])->name('nra.edit');
         Route::put('/nra/{id}', [NraController::class, 'update'])->name('nra.update');
         Route::delete('/nra/{id}', [NraController::class, 'destroy'])->name('nra.destroy');
+
+        // User Management Routes
+        Route::get('/user-management', [UserManagementController::class, 'index'])->name('user-management.index');
+        Route::get('/user-management/create', [UserManagementController::class, 'create'])->name('user-management.create');
+        Route::post('/user-management', [UserManagementController::class, 'store'])->name('user-management.store');
+        Route::get('/user-management/{id}/edit', [UserManagementController::class, 'edit'])->name('user-management.edit');
+        Route::put('/user-management/{id}', [UserManagementController::class, 'update'])->name('user-management.update');
+        Route::delete('/user-management/{id}', [UserManagementController::class, 'destroy'])->name('user-management.destroy');
     });
 });

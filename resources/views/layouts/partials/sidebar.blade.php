@@ -37,11 +37,11 @@
                 </a>
             </div>
 
-            <!-- UBs Dropdown -->
+            <!-- Sector Dropdown -->
             <div>
                 <div
                     class="text-xs uppercase text-white/60 font-semibold tracking-wider mb-2 px-1 sidebar-text transition-all duration-300 ease-in-out">
-                    UBs
+                    Sectors
                 </div>
                 <div class="relative">
                     <button onclick="toggleProgramsDropdown()"
@@ -49,7 +49,7 @@
                         <div class="flex items-center">
                             <i
                                 class="fas fa-file w-5 text-center transition-transform duration-200 group-hover:scale-110 flex-shrink-0"></i>
-                            <span class="sidebar-text ml-3 transition-all duration-300 ease-in-out">UBs</span>
+                            <span class="sidebar-text ml-3 transition-all duration-300 ease-in-out">Sectors</span>
                         </div>
                         <i id="programs-dropdown-icon"
                             class="fas fa-chevron-down text-xs transition-transform duration-200 sidebar-text"></i>
@@ -58,7 +58,7 @@
                         </div>
                     </button>
 
-                    <div id="programs-dropdown" class="mt-1 space-y-1 pl-4">
+                    <div id="programs-dropdown" class="mt-1 space-y-1 pl-4 hidden">
                         <a href="{{ route('gass.index') }}"
                             class="sidebar-nav-item group relative flex items-center px-4 py-2 text-white/85 rounded-lg transition-all duration-200 hover:bg-emerald-700/15 hover:translate-x-1.5 hover:shadow-sm active:scale-[0.98] {{ request()->routeIs('gass.index') ? 'active bg-emerald-600/30' : '' }}">
                             <i class="fas fa-circle text-xs mr-2 flex-shrink-0"></i>
@@ -87,21 +87,30 @@
                         </a>
 
                         <a href="{{ route('biodiversity.index') }}"
-                            class="sidebar-nav-item group relative flex items-center px-4 py-2 text-white/85 rounded-lg transition-all duration-200 hover:bg-emerald-700/15 hover:translate-x-1.5 hover:shadow-sm active:scale-[0.98]">
+                            class="sidebar-nav-item group relative flex items-center px-4 py-2 text-white/85 rounded-lg transition-all duration-200 hover:bg-emerald-700/15 hover:translate-x-1.5 hover:shadow-sm active:scale-[0.98] {{ request()->routeIs('biodiversity.index') ? 'active bg-emerald-600/30' : '' }}">
                             <i class="fas fa-circle text-xs mr-2 flex-shrink-0"></i>
                             <span class="sidebar-text transition-all duration-300 ease-in-out">Biodiversity</span>
+                            <div
+                                class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-emerald-300 rounded-r opacity-0 group-[.active]:opacity-100 transition-opacity">
+                            </div>
                         </a>
 
                         <a href="{{ route('lands.index') }}"
-                            class="sidebar-nav-item group relative flex items-center px-4 py-2 text-white/85 rounded-lg transition-all duration-200 hover:bg-emerald-700/15 hover:translate-x-1.5 hover:shadow-sm active:scale-[0.98]">
+                            class="sidebar-nav-item group relative flex items-center px-4 py-2 text-white/85 rounded-lg transition-all duration-200 hover:bg-emerald-700/15 hover:translate-x-1.5 hover:shadow-sm active:scale-[0.98] {{ request()->routeIs('lands.index') ? 'active bg-emerald-600/30' : '' }}">
                             <i class="fas fa-circle text-xs mr-2 flex-shrink-0"></i>
                             <span class="sidebar-text transition-all duration-300 ease-in-out">Lands</span>
+                            <div
+                                class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-emerald-300 rounded-r opacity-0 group-[.active]:opacity-100 transition-opacity">
+                            </div>
                         </a>
 
                         <a href="{{ route('soilcon.index') }}"
-                            class="sidebar-nav-item group relative flex items-center px-4 py-2 text-white/85 rounded-lg transition-all duration-200 hover:bg-emerald-700/15 hover:translate-x-1.5 hover:shadow-sm active:scale-[0.98] {{ request()->routeIs('soilcon.index') ? 'bg-emerald-700/25' : '' }}">
+                            class="sidebar-nav-item group relative flex items-center px-4 py-2 text-white/85 rounded-lg transition-all duration-200 hover:bg-emerald-700/15 hover:translate-x-1.5 hover:shadow-sm active:scale-[0.98] {{ request()->routeIs('soilcon.index') ? 'active bg-emerald-600/30' : '' }}">
                             <i class="fas fa-circle text-xs mr-2 flex-shrink-0"></i>
                             <span class="sidebar-text transition-all duration-300 ease-in-out">Soilcon</span>
+                            <div
+                                class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-emerald-300 rounded-r opacity-0 group-[.active]:opacity-100 transition-opacity">
+                            </div>
                         </a>
 
                         <a href="{{ route('nra.index') }}"
@@ -122,11 +131,14 @@
                     class="text-xs uppercase text-white/60 font-semibold tracking-wider mb-2 px-1 sidebar-text transition-all duration-300 ease-in-out">
                     System Administration
                 </div>
-                <a href="#"
-                    class="sidebar-nav-item group relative flex items-center px-3 py-2.5 rounded-lg text-white/90 transition-all duration-200 hover:bg-emerald-700/20 hover:translate-x-1 hover:shadow-sm active:scale-[0.98]">
+                <a href="{{ route('user-management.index') }}"
+                    class="sidebar-nav-item group relative flex items-center px-3 py-2.5 rounded-lg text-white/90 transition-all duration-200 hover:bg-emerald-700/20 hover:translate-x-1 hover:shadow-sm active:scale-[0.98] {{ request()->routeIs('user-management.*') ? 'active bg-emerald-600/40' : '' }}">
                     <i
-                        class="fas fa-cog w-5 text-center transition-transform duration-200 group-hover:scale-110 flex-shrink-0"></i>
-                    <span class="sidebar-text ml-3 transition-all duration-300 ease-in-out">Settings</span>
+                        class="fas fa-users w-5 text-center transition-transform duration-200 group-hover:scale-110 flex-shrink-0"></i>
+                    <span class="sidebar-text ml-3 transition-all duration-300 ease-in-out">User Management</span>
+                    <div
+                        class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-emerald-300 rounded-r opacity-0 group-[.active]:opacity-100 transition-opacity">
+                    </div>
                 </a>
             </div>
 
@@ -144,11 +156,11 @@
                     class="fas fa-tachometer-alt w-5 text-center transition-transform duration-200 group-hover:scale-110"></i>
             </a>
 
-            <!-- UBs Dropdown with Click -->
+            <!-- Sector Dropdown with Click -->
             <div class="dropdown-container" style="position: relative;">
                 <button onclick="toggleDropdown('ubs-dropdown')"
                     class="flex justify-center p-3 rounded-lg text-white/90 transition-all duration-200 hover:bg-emerald-700/20 active:scale-[0.98] {{ request()->routeIs('gass.*') || request()->routeIs('sto.*') ? 'bg-emerald-600/40' : '' }}"
-                    title="UBs">
+                    title="sectors">
                     <i class="fas fa-file w-5 text-center transition-transform duration-200 hover:scale-110"></i>
                 </button>
 
@@ -159,7 +171,7 @@
                         class="bg-gradient-to-b from-green-700 to-emerald-800 rounded-lg shadow-xl border border-green-600 py-2 min-w-48">
                         <div
                             class="px-3 py-2 text-xs font-semibold text-white/80 uppercase tracking-wider border-b border-green-600">
-                            UBs
+                            sectors
                         </div>
                         <a href="{{ route('gass.index') }}"
                             class="flex items-center px-3 py-2 text-sm text-white/90 hover:bg-emerald-600/30 transition-colors {{ request()->routeIs('gass.index') ? 'bg-emerald-600/40' : '' }}">
@@ -200,11 +212,12 @@
                 </div>
             </div>
 
-            <div class="border-t border-green-600 pt-2 mt-4">
-                <a href="#"
-                    class="group flex justify-center p-3 rounded-lg text-white/90 transition-all duration-200 hover:bg-emerald-700/20 active:scale-[0.98]"
-                    title="Settings">
-                    <i class="fas fa-cog w-5 text-center transition-transform duration-200 group-hover:scale-110"></i>
+            <div class="border-t border-green-600 pt-2 mt-4 space-y-2">
+                <a href="{{ route('user-management.index') }}"
+                    class="group flex justify-center p-3 rounded-lg text-white/90 transition-all duration-200 hover:bg-emerald-700/20 active:scale-[0.98] {{ request()->routeIs('user-management.*') ? 'bg-emerald-600/40' : '' }}"
+                    title="User Management">
+                    <i
+                        class="fas fa-users w-5 text-center transition-transform duration-200 group-hover:scale-110"></i>
                 </a>
             </div>
         </div>
@@ -254,13 +267,18 @@
         icon.classList.toggle('rotate-180');
     }
 
-    // Auto-open when child is active
+    // Auto-open when on sector route
     document.addEventListener('DOMContentLoaded', function() {
-        const isUBsActive =
+        const isSectorRoute =
             {{ request()->routeIs('gass.*') ? 'true' : 'false' }} ||
-            {{ request()->routeIs('sto.*') ? 'true' : 'false' }}
+            {{ request()->routeIs('sto.*') ? 'true' : 'false' }} ||
+            {{ request()->routeIs('enf.*') ? 'true' : 'false' }} ||
+            {{ request()->routeIs('biodiversity.*') ? 'true' : 'false' }} ||
+            {{ request()->routeIs('lands.*') ? 'true' : 'false' }} ||
+            {{ request()->routeIs('soilcon.*') ? 'true' : 'false' }} ||
+            {{ request()->routeIs('nra.*') ? 'true' : 'false' }}
 
-        if (isUBsActive) {
+        if (isSectorRoute) {
             document.getElementById('programs-dropdown')?.classList.remove('hidden');
             document.getElementById('programs-dropdown-icon')?.classList.add('rotate-180');
         }

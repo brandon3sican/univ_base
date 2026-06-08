@@ -12,7 +12,7 @@
             @include('layouts.partials.header', ['pageTitle' => $pageTitle ?? 'Dashboard', 'userName' => $userName ?? 'Admin User', 'userAvatar' => $userAvatar ?? null])
 
             <!-- Page Content -->
-            <main class="flex-1 overflow-y-auto p-6 bg-gray-50">
+            <main class="flex-1 overflow-y-auto p-6 bg-gray-50" style="font-size: 50%;">
                 @yield('content')
             </main>
 

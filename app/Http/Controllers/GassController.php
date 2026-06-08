@@ -27,7 +27,7 @@ class GassController extends Controller
         
         $offices = Office::all();
         $ppas = Ppa::where('types_id', 1)->get();
-        return view('gass.index', compact('gasses', 'offices', 'ppas'));
+        return view('sectors.gass.index', compact('gasses', 'offices', 'ppas'));
     }
 
     /**
@@ -174,12 +174,11 @@ class GassController extends Controller
         $gassData = [
             'ppa_id' => $ppaId,
             'indicator_id' => $indicatorId,
-            // These are JSON columns; model casts handle encoding/decoding.
-            'office_id' => $officeId ?: null,
-            'universe' => $universeValue ?: null, // office->value structure
-            'accomplishment' => $accomplishment ?: null,
-            'targets' => $targets ?: null,
-            'years' => $years ?: null,
+            'office_id' => $officeId ? json_encode($officeId) : null,
+            'universe' => $universeValue ? json_encode($universeValue) : null, // Store office->value structure as JSON
+            'accomplishment' => $accomplishment ? json_encode($accomplishment) : null,
+            'targets' => $targets ? json_encode($targets) : null,
+            'years' => $years ? json_encode($years) : null,
             'remarks' => $request->remarks,
         ];
 
@@ -254,15 +253,19 @@ class GassController extends Controller
             foreach ($officeIds as $officeId) {
                 $office = Office::find($officeId);
                 if ($office) {
-                    $officeData[$officeId] = [
-                        'id' => $record->id,
-                        'universe' => $record->universe,
-                        'accomplishment' => $record->accomplishment,
-                        'targets' => $record->targets,
-                        'years' => $record->years,
-                        'remarks' => $record->remarks,
-                        'office_name' => $office->name
-                    ];
+                    // Only add office data if it belongs to the current record being edited
+                    // This prevents overwriting with data from other records with similar PPA names
+                    if ($record->id == $gass->id) {
+                        $officeData[$officeId] = [
+                            'id' => $record->id,
+                            'universe' => $record->universe,
+                            'accomplishment' => $record->accomplishment,
+                            'targets' => $record->targets,
+                            'years' => $record->years,
+                            'remarks' => $record->remarks,
+                            'office_name' => $office->name
+                        ];
+                    }
                 }
             }
         }
@@ -502,7 +505,31 @@ class GassController extends Controller
     public function destroy(string $id): JsonResponse
     {
         $gass = Gass::findOrFail($id);
+        $ppaId = $gass->ppa_id;
+        
         $gass->delete();
+        
+        // Check if PPA is used by other records
+        $ppaUsageCount = Gass::where('ppa_id', $ppaId)->count();
+        
+        if ($ppaUsageCount === 0 && $ppaId) {
+            $ppa = \App\Models\Ppa::find($ppaId);
+            if ($ppa) {
+                $ppaDetailsId = $ppa->ppa_details_id;
+                $ppa->delete();
+                
+                // Delete PPA details if not used by other PPAs
+                if ($ppaDetailsId) {
+                    $ppaDetailsUsageCount = \App\Models\Ppa::where('ppa_details_id', $ppaDetailsId)->count();
+                    if ($ppaDetailsUsageCount === 0) {
+                        $ppaDetails = \App\Models\PpaDetails::find($ppaDetailsId);
+                        if ($ppaDetails) {
+                            $ppaDetails->delete();
+                        }
+                    }
+                }
+            }
+        }
         
         return response()->json([
             'success' => true,

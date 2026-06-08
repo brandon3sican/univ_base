@@ -28,7 +28,7 @@ class NraController extends Controller
         $offices = Office::all();
         $ppas = Ppa::where('types_id', 7)->get();
 
-        return view('nra.index', compact('nras', 'offices', 'ppas'));
+        return view('sectors.nra.index', compact('nras', 'offices', 'ppas'));
     }
 
     /**
@@ -256,15 +256,19 @@ class NraController extends Controller
             foreach ($officeIds as $officeId) {
                 $office = Office::find($officeId);
                 if ($office) {
-                    $officeData[$officeId] = [
-                        'id' => $record->id,
-                        'universe' => $record->universe,
-                        'accomplishment' => $record->accomplishment,
-                        'targets' => $record->targets,
-                        'years' => $record->years,
-                        'remarks' => $record->remarks,
-                        'office_name' => $office->name,
-                    ];
+                    // Only add office data if it belongs to the current record being edited
+                    // This prevents overwriting with data from other records with similar PPA names
+                    if ($record->id == $nra->id) {
+                        $officeData[$officeId] = [
+                            'id' => $record->id,
+                            'universe' => $record->universe,
+                            'accomplishment' => $record->accomplishment,
+                            'targets' => $record->targets,
+                            'years' => $record->years,
+                            'remarks' => $record->remarks,
+                            'office_name' => $office->name,
+                        ];
+                    }
                 }
             }
         }
@@ -503,7 +507,31 @@ class NraController extends Controller
     public function destroy(string $id): JsonResponse
     {
         $nra = Nra::findOrFail($id);
+        $ppaId = $nra->ppa_id;
+        
         $nra->delete();
+        
+        // Check if PPA is used by other records
+        $ppaUsageCount = Nra::where('ppa_id', $ppaId)->count();
+        
+        if ($ppaUsageCount === 0 && $ppaId) {
+            $ppa = \App\Models\Ppa::find($ppaId);
+            if ($ppa) {
+                $ppaDetailsId = $ppa->ppa_details_id;
+                $ppa->delete();
+                
+                // Delete PPA details if not used by other PPAs
+                if ($ppaDetailsId) {
+                    $ppaDetailsUsageCount = \App\Models\Ppa::where('ppa_details_id', $ppaDetailsId)->count();
+                    if ($ppaDetailsUsageCount === 0) {
+                        $ppaDetails = \App\Models\PpaDetails::find($ppaDetailsId);
+                        if ($ppaDetails) {
+                            $ppaDetails->delete();
+                        }
+                    }
+                }
+            }
+        }
 
         return response()->json([
             'success' => true,

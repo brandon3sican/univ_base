@@ -48,4 +48,9 @@ class Ppa extends Model
     {
         return $this->hasMany(Sto::class);
     }
+
+    public function offices()
+    {
+        return $this->belongsToMany(Office::class, 'ppa', 'id', 'office_id');
+    }
 }
