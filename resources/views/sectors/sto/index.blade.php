@@ -87,35 +87,35 @@
                     <!-- First row: main headers -->
                     <tr class="border-b border-gray-300">
                         <th rowspan="2"
-                            class="px-2 py-0.5 text-center text-[9px] font-bold uppercase tracking-wider border-r border-gray-300 bg-gradient-to-b from-gray-100 to-gray-200">
+                            class="px-2 py-0.5 text-center text-[12px] font-bold uppercase tracking-wider border-r border-gray-300 bg-gradient-to-b from-gray-100 to-gray-200">
                             <div class="flex items-center justify-center">
                                 <i class="fas fa-list-ul mr-2 text-gray-500"></i>
                                 PPA & Output Indicators
                             </div>
                         </th>
                         <th rowspan="2"
-                            class="px-2 py-0.5 text-center text-[9px] font-bold uppercase tracking-wider border-r border-gray-300 bg-gradient-to-b from-gray-100 to-gray-200">
+                            class="px-2 py-0.5 text-center text-[12px] font-bold uppercase tracking-wider border-r border-gray-300 bg-gradient-to-b from-gray-100 to-gray-200">
                             <div class="flex items-center justify-center">
                                 <i class="fas fa-building mr-2 text-gray-500"></i>
                                 OFFICE
                             </div>
                         </th>
                         <th rowspan="2"
-                            class="px-2 py-0.5 text-center text-[9px] font-bold uppercase tracking-wider border-r border-gray-300 bg-gradient-to-b from-gray-100 to-gray-200">
+                            class="px-2 py-0.5 text-center text-[12px] font-bold uppercase tracking-wider border-r border-gray-300 bg-gradient-to-b from-gray-100 to-gray-200">
                             <div class="flex items-center justify-center">
                                 <i class="fas fa-globe mr-2 text-gray-500"></i>
                                 UNIVERSE
                             </div>
                         </th>
                         <th rowspan="2"
-                            class="px-2 py-0.5 text-center text-[9px] font-bold uppercase tracking-wider border-r border-gray-300 bg-gradient-to-b from-gray-100 to-gray-200">
+                            class="px-2 py-0.5 text-center text-[12px] font-bold uppercase tracking-wider border-r border-gray-300 bg-gradient-to-b from-gray-100 to-gray-200">
                             <div class="flex items-center justify-center">
                                 <i class="fas fa-chart-line mr-2 text-gray-500"></i>
                                 BASELINE
                             </div>
                         </th>
                         <th colspan="2"
-                            class="px-2 py-0.5 text-center text-[9px] font-bold uppercase tracking-wider border-r border-gray-300 bg-gradient-to-b from-gray-100 to-gray-200">
+                            class="px-2 py-0.5 text-center text-[12px] font-bold uppercase tracking-wider border-r border-gray-300 bg-gradient-to-b from-gray-100 to-gray-200">
                             <div class="flex items-center justify-center">
                                 <i class="fas fa-tasks mr-2 text-gray-500"></i>
                                 ACCOMPLISHMENT
@@ -148,7 +148,7 @@
 
                         <!-- This is the new parent column for target years -->
                         <th colspan="{{ count($targetYears) }}"
-                            class="px-2 py-1 text-center text-[10px] font-bold uppercase tracking-wider border-r border-gray-300 bg-gradient-to-b from-gray-100 to-gray-200 hidden"
+                            class="px-2 py-1 text-center text-[12px] font-bold uppercase tracking-wider border-r border-gray-300 bg-gradient-to-b from-gray-100 to-gray-200 hidden"
                             id="targetHeader">
                             <div class="flex items-center justify-center">
                                 <i class="fas fa-bullseye mr-2 text-gray-500"></i>
@@ -157,7 +157,7 @@
                         </th>
 
                         <th rowspan="2"
-                            class="px-2 py-1 text-center text-[10px] font-bold uppercase tracking-wider border-r border-gray-300 bg-gradient-to-b from-gray-100 to-gray-200 hidden"
+                            class="px-2 py-1 text-center text-[12px] font-bold uppercase tracking-wider border-r border-gray-300 bg-gradient-to-b from-gray-100 to-gray-200 hidden"
                             id="remarksHeader">
                             <div class="flex items-center justify-center">
                                 <i class="fas fa-comment mr-2 text-gray-500"></i>
@@ -165,7 +165,7 @@
                             </div>
                         </th>
                         <th rowspan="2"
-                            class="px-2 py-1 text-center text-[10px] font-bold uppercase tracking-wider border-r border-gray-300 bg-gradient-to-b from-gray-100 to-gray-200 hidden"
+                            class="px-2 py-1 text-center text-[12px] font-bold uppercase tracking-wider border-r border-gray-300 bg-gradient-to-b from-gray-100 to-gray-200 hidden"
                             id="actionsHeader">
                             <div class="flex items-center justify-center">
                                 <i class="fas fa-cogs mr-2 text-gray-500"></i>
@@ -189,7 +189,7 @@
                         @if (count($targetYears) > 0)
                             @foreach ($targetYears as $year)
                                 <th
-                                    class="px-1 py-0.5 text-center text-[10px] font-bold uppercase tracking-wider border-r border-gray-300 bg-gradient-to-b from-gray-100 to-gray-200 hidden">
+                                    class="px-1 py-0.5 text-center text-[12px] font-bold uppercase tracking-wider border-r border-gray-300 bg-gradient-to-b from-gray-100 to-gray-200 hidden">
                                     {{ $year }}
                                 </th>
                             @endforeach
@@ -737,7 +737,7 @@
             // Single row with all data types for this office
             const officeRow = document.createElement('tr');
             officeRow.innerHTML = `
-                <td class="px-4 py-3 text-[10px] font-medium text-gray-900">${officeLabel}</td>
+                <td class="px-4 py-3 text-[12px] font-medium text-gray-900">${officeLabel}</td>
                 <td class="px-2 py-2 text-center">
                     <input type="number" name="universe[${officeId}]" class="w-full px-2 py-1 border border-gray-300 rounded text-center font-medium text-blue-600" placeholder="0" min="0" step="1" oninput="this.value = Math.floor(Math.max(0, this.value))">
                 </td>
@@ -1022,7 +1022,7 @@
                     <td class="px-2 py-1 text-[8px] text-gray-900" colspan="${colspan}">
                         ${!isConsecutiveDuplicate ? getIndentedPPAName(item) : ''}
                         ${getIndentedIndicatorName(item)}
-                        <div class="text-[10px] text-gray-600 mt-0.5 ${getIndentClass(item)}">
+                        <div class="text-[12px] text-gray-600 mt-0.5 ${getIndentClass(item)}">
                             ${formatOfficeNames(item.office_id) !== 'N/A' ? '<span class="font-medium">Office:</span> ' + formatOfficeNames(item.office_id) : ''}
                             ${formatOfficeNames(item.office_id) !== 'N/A' && item.universe && Object.keys(item.universe).length > 0 ? ' | ' : ''}
                             ${item.universe && Object.keys(item.universe).length > 0 ? '<span class="font-medium">Universe:</span> ' + formatUniverseData(item.universe) : ''}
@@ -1053,25 +1053,25 @@
                 row.innerHTML = `
                     <td class="px-2 py-1 text-[8px] text-gray-900">
                         ${!isConsecutiveDuplicate ? getIndentedPPAName(item) : ''}
-                        ${getIndentedIndicatorName(item) || '<div class="text-[10px] text-gray-400 mt-0.5">No indicator</div>'}
+                        ${getIndentedIndicatorName(item) || '<div class="text-[12px] text-gray-400 mt-0.5">No indicator</div>'}
                     </td>
-                    <td class="px-2 py-1 text-[10px] text-gray-900">
+                    <td class="px-2 py-1 text-[12px] text-gray-900">
                         ${formatOfficeNames(item.office_id)}
                     </td>
-                    <td class="px-2 py-1 text-[10px] text-gray-900 text-center">
+                    <td class="px-2 py-1 text-[12px] text-gray-900 text-center">
                         ${item.universe && Object.keys(item.universe).length > 0 ? formatUniverseData(item.universe, item.targets) : ''}
                     </td>
-                    <td class="px-2 py-1 text-[10px] text-gray-900 text-center">
+                    <td class="px-2 py-1 text-[12px] text-gray-900 text-center">
                         ${calculateBaseline(item.universe, item.accomplishment, item.office_id)}
                     </td>
-                    <td class="px-2 py-1 text-[10px] text-gray-900 text-center">
+                    <td class="px-2 py-1 text-[12px] text-gray-900 text-center">
                         ${formatAccomplishmentPerOffice(item.accomplishment, item.office_id)}
                     </td>
-                    <td class="px-2 py-1 text-[10px] text-gray-900 text-center">
+                    <td class="px-2 py-1 text-[12px] text-gray-900 text-center">
                         ${getCurrentYearAccomplishment(item.accomplishment, item.office_id)}
                     </td>
-                    <td class="px-2 py-1 text-[10px] text-gray-900 hidden remarks-column">${item.remarks || '-'}</td>
-                    <td class="px-2 py-1 text-[10px] text-gray-900 hidden actions-column">
+                    <td class="px-2 py-1 text-[12px] text-gray-900 hidden remarks-column">${item.remarks || '-'}</td>
+                    <td class="px-2 py-1 text-[12px] text-gray-900 hidden actions-column">
                         <div class="flex justify-center space-x-2">
                             <button onclick="editRecord(${item.id})" class="text-blue-600 hover:text-blue-800">
                                 <i class="fas fa-edit"></i>
@@ -1220,7 +1220,7 @@
                 subActivityCounter[programCounter][projectCounter[programCounter]][currentMainForSub][currentMajor]++;
                 numbering =
                     `${programCounter}.${projectCounter[programCounter]}.${currentMainForSub}.${currentMajor}.${subActivityCounter[programCounter][projectCounter[programCounter]][currentMainForSub][currentMajor]}. `;
-                className = 'font-medium text-[10px] ml-24';
+                className = 'font-medium text-[12px] ml-24';
                 break;
             case 'ACTIONABLE TASK':
                 const currentMainForTask = mainActivityCounter[programCounter][projectCounter[programCounter]];
@@ -1232,7 +1232,7 @@
                 ][currentMajorForTask];
                 numbering =
                     `${programCounter}.${projectCounter[programCounter]}.${currentMainForTask}.${currentMajorForTask}.${currentSubForTask}.1. `;
-                className = 'font-normal text-[10px] ml-30';
+                className = 'font-normal text-[12px] ml-30';
                 break;
             default:
                 numbering = '';
