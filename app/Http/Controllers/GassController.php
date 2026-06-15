@@ -8,18 +8,79 @@ use App\Models\Indicator;
 use App\Models\Office;
 use App\Models\Type;
 use App\Models\RecordType;
+use App\Models\EditHistory;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class GassController extends Controller
 {
+    /**
+     * Log edit history for a model
+     */
+    private function logEditHistory($model, $action, $changes = null)
+    {
+        try {
+            $user = Auth::user();
+            if (!$user) {
+                Log::warning('EditHistory: No authenticated user');
+                return;
+            }
+
+            $description = null;
+            if ($action === 'created') {
+                $description = 'Created ' . strtolower(class_basename($model));
+            } elseif ($action === 'updated') {
+                // Get PPA name if PPA-related fields were changed
+                $ppaName = null;
+                if (isset($changes['new']['ppa_id']) && $model->ppa) {
+                    $ppaName = $model->ppa->name;
+                }
+
+                if ($ppaName) {
+                    $description = "Edited PPA: {$ppaName}";
+                } else {
+                    $description = 'Edited ' . strtolower(class_basename($model));
+                }
+            } elseif ($action === 'deleted') {
+                $description = 'Deleted ' . strtolower(class_basename($model));
+            }
+
+            EditHistory::create([
+                'user_id' => $user->id,
+                'model_type' => get_class($model),
+                'model_id' => $model->id,
+                'action' => $action,
+                'changes' => $changes,
+                'description' => $description,
+            ]);
+
+            Log::info('EditHistory: Logged ' . $action . ' for ' . class_basename($model) . ' ID: ' . $model->id);
+        } catch (\Exception $e) {
+            Log::error('EditHistory: Error logging edit history - ' . $e->getMessage());
+            Log::error('EditHistory: Stack trace - ' . $e->getTraceAsString());
+        }
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $gasses = Gass::with(['ppa.recordType', 'indicator'])->get();
+        $ppaName = request()->query('ppa_name');
+        $recordId = request()->query('record_id');
+        
+        $query = Gass::with(['ppa.recordType', 'indicator']);
+        
+        // Filter by PPA name if provided
+        if ($ppaName) {
+            $query->whereHas('ppa', function($q) use ($ppaName) {
+                $q->where('name', 'like', '%' . $ppaName . '%');
+            });
+        }
+        
+        $gasses = $query->get();
         
         if (request()->expectsJson()) {
             return response()->json($gasses);
@@ -27,7 +88,7 @@ class GassController extends Controller
         
         $offices = Office::all();
         $ppas = Ppa::where('types_id', 1)->get();
-        return view('sectors.gass.index', compact('gasses', 'offices', 'ppas'));
+        return view('sectors.gass.index', compact('gasses', 'offices', 'ppas', 'ppaName', 'recordId'));
     }
 
     /**
@@ -188,7 +249,10 @@ class GassController extends Controller
         \Log::info('Universe value: ' . var_export($universe, true));
 
         $gass = Gass::create($gassData);
-        
+
+        // Log edit history for creation
+        $this->logEditHistory($gass, 'created', ['new' => $gassData]);
+
         return response()->json([
                 'success' => true,
                 'message' => 'GASS record created successfully',
@@ -462,6 +526,13 @@ class GassController extends Controller
                 }
                 error_log("GASS UPDATE - Result: SUCCESS");
                 error_log("GASS UPDATE - Updated record: " . json_encode($existingGass->fresh()->toArray()));
+
+                // Log edit history
+                $changes = [
+                    'old' => array_intersect_key($existingGass->getOriginal(), $updateData),
+                    'new' => $updateData,
+                ];
+                $this->logEditHistory($existingGass, 'updated', $changes);
             } catch (\Exception $updateException) {
                 error_log("GASS UPDATE - Update Exception: " . $updateException->getMessage());
                 throw $updateException;
@@ -506,7 +577,10 @@ class GassController extends Controller
     {
         $gass = Gass::findOrFail($id);
         $ppaId = $gass->ppa_id;
-        
+
+        // Log edit history before deletion
+        $this->logEditHistory($gass, 'deleted', ['deleted' => $gass->toArray()]);
+
         $gass->delete();
         
         // Check if PPA is used by other records

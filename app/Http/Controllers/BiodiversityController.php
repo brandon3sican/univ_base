@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Biodiversity;
+use App\Models\EditHistory;
 use App\Models\Indicator;
 use App\Models\Office;
 use App\Models\Ppa;
@@ -10,16 +11,76 @@ use App\Models\RecordType;
 use App\Models\Type;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class BiodiversityController extends Controller
 {
     /**
+     * Log edit history for a model
+     */
+    private function logEditHistory($model, $action, $changes = null)
+    {
+        try {
+            $user = Auth::user();
+            if (!$user) {
+                Log::warning('EditHistory: No authenticated user');
+                return;
+            }
+
+            $description = null;
+            if ($action === 'created') {
+                $description = 'Created ' . strtolower(class_basename($model));
+            } elseif ($action === 'updated') {
+                // Get PPA name if PPA-related fields were changed
+                $ppaName = null;
+                if (isset($changes['new']['ppa_id']) && $model->ppa) {
+                    $ppaName = $model->ppa->name;
+                }
+
+                if ($ppaName) {
+                    $description = "Edited PPA: {$ppaName}";
+                } else {
+                    $description = 'Edited ' . strtolower(class_basename($model));
+                }
+            } elseif ($action === 'deleted') {
+                $description = 'Deleted ' . strtolower(class_basename($model));
+            }
+
+            EditHistory::create([
+                'user_id' => $user->id,
+                'model_type' => get_class($model),
+                'model_id' => $model->id,
+                'action' => $action,
+                'changes' => $changes,
+                'description' => $description,
+            ]);
+
+            Log::info('EditHistory: Logged ' . $action . ' for ' . class_basename($model) . ' ID: ' . $model->id);
+        } catch (\Exception $e) {
+            Log::error('EditHistory: Error logging edit history - ' . $e->getMessage());
+            Log::error('EditHistory: Stack trace - ' . $e->getTraceAsString());
+        }
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $biodiversities = Biodiversity::with(['ppa.recordType', 'indicator'])->get();
+        $ppaName = request()->query('ppa_name');
+        $recordId = request()->query('record_id');
+        
+        $query = Biodiversity::with(['ppa.recordType', 'indicator']);
+        
+        // Filter by PPA name if provided
+        if ($ppaName) {
+            $query->whereHas('ppa', function($q) use ($ppaName) {
+                $q->where('name', 'like', '%' . $ppaName . '%');
+            });
+        }
+        
+        $biodiversities = $query->get();
 
         if (request()->expectsJson()) {
             return response()->json($biodiversities);
@@ -28,7 +89,7 @@ class BiodiversityController extends Controller
         $offices = Office::all();
         $ppas = Ppa::where('types_id', 4)->get();
 
-        return view('sectors.biodiversity.index', compact('biodiversities', 'offices', 'ppas'));
+        return view('sectors.biodiversity.index', compact('biodiversities', 'offices', 'ppas', 'ppaName', 'recordId'));
     }
 
     /**
@@ -190,6 +251,9 @@ class BiodiversityController extends Controller
             \Log::info('Universe value: '.var_export($universe, true));
 
             $biodiversity = Biodiversity::create($biodiversityData);
+
+            // Log edit history for creation
+            $this->logEditHistory($biodiversity, 'created', ['new' => $biodiversityData]);
 
             return response()->json([
                 'success' => true,
@@ -466,6 +530,13 @@ class BiodiversityController extends Controller
                 }
                 error_log('BIODIVERSITY UPDATE - Result: SUCCESS');
                 error_log('BIODIVERSITY UPDATE - Updated record: '.json_encode($existingBiodiversity->fresh()->toArray()));
+
+                // Log edit history
+                $changes = [
+                    'old' => array_intersect_key($existingBiodiversity->getOriginal(), $updateData),
+                    'new' => $updateData,
+                ];
+                $this->logEditHistory($existingBiodiversity, 'updated', $changes);
             } catch (\Exception $updateException) {
                 error_log('BIODIVERSITY UPDATE - Update Exception: '.$updateException->getMessage());
                 throw $updateException;
@@ -510,7 +581,10 @@ class BiodiversityController extends Controller
     {
         $biodiversity = Biodiversity::findOrFail($id);
         $ppaId = $biodiversity->ppa_id;
-        
+
+        // Log edit history before deletion
+        $this->logEditHistory($biodiversity, 'deleted', ['deleted' => $biodiversity->toArray()]);
+
         $biodiversity->delete();
         
         // Check if PPA is used by other records

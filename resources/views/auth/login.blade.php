@@ -38,7 +38,7 @@
                 <div class="inline-block p-3 bg-white bg-opacity-10 rounded-full mb-4">
                     <img src="img/denr-logo.png" alt="Logo" class="w-20 h-20">
                 </div>
-                <h1 class="text-3xl font-bold text-white">Universe - Baseline</h1>
+                <h1 class="text-2xl font-bold text-white">Universe - Baseline</h1>
                 <p class="text-green-100 mt-2">Sign in to your account</p>
             </div>
 

@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\HasEditHistory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Gass extends Model
 {
+    use HasEditHistory;
+
     protected $table = 'gass';
     
     protected $fillable = [

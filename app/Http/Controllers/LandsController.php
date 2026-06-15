@@ -2,24 +2,85 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Lands;
+use App\Models\EditHistory;
 use App\Models\Indicator;
+use App\Models\Lands;
 use App\Models\Office;
 use App\Models\Ppa;
 use App\Models\RecordType;
 use App\Models\Type;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class LandsController extends Controller
 {
     /**
+     * Log edit history for a model
+     */
+    private function logEditHistory($model, $action, $changes = null)
+    {
+        try {
+            $user = Auth::user();
+            if (!$user) {
+                Log::warning('EditHistory: No authenticated user');
+                return;
+            }
+
+            $description = null;
+            if ($action === 'created') {
+                $description = 'Created ' . strtolower(class_basename($model));
+            } elseif ($action === 'updated') {
+                // Get PPA name if PPA-related fields were changed
+                $ppaName = null;
+                if (isset($changes['new']['ppa_id']) && $model->ppa) {
+                    $ppaName = $model->ppa->name;
+                }
+
+                if ($ppaName) {
+                    $description = "Edited PPA: {$ppaName}";
+                } else {
+                    $description = 'Edited ' . strtolower(class_basename($model));
+                }
+            } elseif ($action === 'deleted') {
+                $description = 'Deleted ' . strtolower(class_basename($model));
+            }
+
+            EditHistory::create([
+                'user_id' => $user->id,
+                'model_type' => get_class($model),
+                'model_id' => $model->id,
+                'action' => $action,
+                'changes' => $changes,
+                'description' => $description,
+            ]);
+
+            Log::info('EditHistory: Logged ' . $action . ' for ' . class_basename($model) . ' ID: ' . $model->id);
+        } catch (\Exception $e) {
+            Log::error('EditHistory: Error logging edit history - ' . $e->getMessage());
+            Log::error('EditHistory: Stack trace - ' . $e->getTraceAsString());
+        }
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $lands = Lands::with(['ppa.recordType', 'indicator'])->get();
+        $ppaName = request()->query('ppa_name');
+        $recordId = request()->query('record_id');
+        
+        $query = Lands::with(['ppa.recordType', 'indicator']);
+        
+        // Filter by PPA name if provided
+        if ($ppaName) {
+            $query->whereHas('ppa', function($q) use ($ppaName) {
+                $q->where('name', 'like', '%' . $ppaName . '%');
+            });
+        }
+        
+        $lands = $query->get();
 
         if (request()->expectsJson()) {
             return response()->json($lands);
@@ -28,7 +89,7 @@ class LandsController extends Controller
         $offices = Office::all();
         $ppas = Ppa::where('types_id', 5)->get();
 
-        return view('sectors.lands.index', compact('lands', 'offices', 'ppas'));
+        return view('sectors.lands.index', compact('lands', 'offices', 'ppas', 'ppaName', 'recordId'));
     }
 
     /**
@@ -190,6 +251,9 @@ class LandsController extends Controller
             \Log::info('Universe value: '.var_export($universe, true));
 
             $lands = Lands::create($landsData);
+
+            // Log edit history for creation
+            $this->logEditHistory($lands, 'created', ['new' => $landsData]);
 
             return response()->json([
                 'success' => true,
@@ -466,6 +530,13 @@ class LandsController extends Controller
                 }
                 error_log('LANDS UPDATE - Result: SUCCESS');
                 error_log('LANDS UPDATE - Updated record: '.json_encode($existingLands->fresh()->toArray()));
+
+                // Log edit history
+                $changes = [
+                    'old' => array_intersect_key($existingLands->getOriginal(), $updateData),
+                    'new' => $updateData,
+                ];
+                $this->logEditHistory($existingLands, 'updated', $changes);
             } catch (\Exception $updateException) {
                 error_log('LANDS UPDATE - Update Exception: '.$updateException->getMessage());
                 throw $updateException;
@@ -510,7 +581,10 @@ class LandsController extends Controller
     {
         $lands = Lands::findOrFail($id);
         $ppaId = $lands->ppa_id;
-        
+
+        // Log edit history before deletion
+        $this->logEditHistory($lands, 'deleted', ['deleted' => $lands->toArray()]);
+
         $lands->delete();
         
         // Check if PPA is used by other records

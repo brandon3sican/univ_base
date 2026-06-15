@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\HasEditHistory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Ppa extends Model
 {
-    use HasFactory;
+    use HasFactory, HasEditHistory;
 
     protected $table = 'ppa';
 

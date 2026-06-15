@@ -7,7 +7,7 @@
 @section('content')
     <style>
         .table-container {
-            max-height: 70vh;
+            height: 100%;
             overflow-y: auto;
             position: relative;
         }
@@ -87,35 +87,35 @@
                     <!-- First row: main headers -->
                     <tr class="border-b border-gray-300">
                         <th rowspan="2"
-                            class="px-2 py-0.5 text-center text-[10px] font-bold uppercase tracking-wider border-r border-gray-300 bg-gradient-to-b from-gray-100 to-gray-200">
+                            class="px-2 py-0.5 text-center text-[9px] font-bold uppercase tracking-wider border-r border-gray-300 bg-gradient-to-b from-gray-100 to-gray-200">
                             <div class="flex items-center justify-center">
                                 <i class="fas fa-list-ul mr-2 text-gray-500"></i>
                                 PPA & Output Indicators
                             </div>
                         </th>
                         <th rowspan="2"
-                            class="px-2 py-0.5 text-center text-[10px] font-bold uppercase tracking-wider border-r border-gray-300 bg-gradient-to-b from-gray-100 to-gray-200">
+                            class="px-2 py-0.5 text-center text-[9px] font-bold uppercase tracking-wider border-r border-gray-300 bg-gradient-to-b from-gray-100 to-gray-200">
                             <div class="flex items-center justify-center">
                                 <i class="fas fa-building mr-2 text-gray-500"></i>
                                 OFFICE
                             </div>
                         </th>
                         <th rowspan="2"
-                            class="px-2 py-0.5 text-center text-[10px] font-bold uppercase tracking-wider border-r border-gray-300 bg-gradient-to-b from-gray-100 to-gray-200">
+                            class="px-2 py-0.5 text-center text-[9px] font-bold uppercase tracking-wider border-r border-gray-300 bg-gradient-to-b from-gray-100 to-gray-200">
                             <div class="flex items-center justify-center">
                                 <i class="fas fa-globe mr-2 text-gray-500"></i>
                                 UNIVERSE
                             </div>
                         </th>
                         <th rowspan="2"
-                            class="px-2 py-0.5 text-center text-[10px] font-bold uppercase tracking-wider border-r border-gray-300 bg-gradient-to-b from-gray-100 to-gray-200">
+                            class="px-2 py-0.5 text-center text-[9px] font-bold uppercase tracking-wider border-r border-gray-300 bg-gradient-to-b from-gray-100 to-gray-200">
                             <div class="flex items-center justify-center">
                                 <i class="fas fa-chart-line mr-2 text-gray-500"></i>
                                 BASELINE
                             </div>
                         </th>
                         <th colspan="2"
-                            class="px-2 py-0.5 text-center text-[10px] font-bold uppercase tracking-wider border-r border-gray-300 bg-gradient-to-b from-gray-100 to-gray-200">
+                            class="px-2 py-0.5 text-center text-[9px] font-bold uppercase tracking-wider border-r border-gray-300 bg-gradient-to-b from-gray-100 to-gray-200">
                             <div class="flex items-center justify-center">
                                 <i class="fas fa-tasks mr-2 text-gray-500"></i>
                                 ACCOMPLISHMENT
@@ -178,11 +178,11 @@
                     <tr class="border-b border-gray-300">
                         <!-- Accomplishment sub-headers -->
                         <th
-                            class="px-1 py-0.5 text-center text-[10px] font-bold uppercase tracking-wider border-r border-gray-300 bg-gradient-to-b from-gray-100 to-gray-200">
+                            class="px-1 py-0.5 text-center text-[8px] font-bold uppercase tracking-wider border-r border-gray-300 bg-gradient-to-b from-gray-100 to-gray-200">
                             Past Years (2022-{{ date('Y') - 1 }})
                         </th>
                         <th
-                            class="px-1 py-0.5 text-center text-[10px] font-bold uppercase tracking-wider border-r border-gray-300 bg-gradient-to-b from-gray-100 to-gray-200">
+                            class="px-1 py-0.5 text-center text-[8px] font-bold uppercase tracking-wider border-r border-gray-300 bg-gradient-to-b from-gray-100 to-gray-200">
                             Current Year ({{ date('Y') }})
                         </th>
                         <!-- Target year sub-headers - use the $targetYears already calculated above -->
@@ -737,15 +737,15 @@
             // Single row with all data types for this office
             const officeRow = document.createElement('tr');
             officeRow.innerHTML = `
-                <td class="px-4 py-3 text-xs font-medium text-gray-900">${officeLabel}</td>
+                <td class="px-4 py-3 text-[10px] font-medium text-gray-900">${officeLabel}</td>
                 <td class="px-2 py-2 text-center">
                     <input type="number" name="universe[${officeId}]" class="w-full px-2 py-1 border border-gray-300 rounded text-center font-medium text-blue-600" placeholder="0" min="0" step="1" oninput="this.value = Math.floor(Math.max(0, this.value))">
                 </td>
                 ${years.map(year => `
                     <td class="px-2 py-3 text-center p-1" style="min-width: 80px;">
                         <div class="space-y-1">
-                            <input type="number" name="accomplishment[${officeId}][${year}]" class="w-full px-2 py-1 border border-gray-300 rounded text-center text-sm text-green-600 font-medium" placeholder="A" min="0" step="1" oninput="this.value = Math.floor(Math.max(0, this.value))">
-                            <input type="number" name="targets[${officeId}][${year}]" class="w-full px-2 py-1 border border-gray-300 rounded text-center text-sm text-purple-600 font-medium" placeholder="T" min="0" step="1" oninput="this.value = Math.floor(Math.max(0, this.value))">
+                            <input type="number" name="accomplishment[${officeId}][${year}]" class="w-full px-2 py-1 border border-gray-300 rounded text-center text-xs text-green-600 font-medium" placeholder="A" min="0" step="1" oninput="this.value = Math.floor(Math.max(0, this.value))">
+                            <input type="number" name="targets[${officeId}][${year}]" class="w-full px-2 py-1 border border-gray-300 rounded text-center text-xs text-purple-600 font-medium" placeholder="T" min="0" step="1" oninput="this.value = Math.floor(Math.max(0, this.value))">
                         </div>
                     </td>
                 `).join('')}
@@ -981,6 +981,7 @@
 
         data.forEach(item => {
             const row = document.createElement('tr');
+            row.setAttribute('data-record-id', item.id);
 
             // Get PPA name for consecutive duplicate checking
             const ppaName = item.ppa ? item.ppa.name : '';
@@ -1018,10 +1019,10 @@
                 }
 
                 row.innerHTML = `
-                    <td class="px-2 py-1 text-xs text-gray-900" colspan="${colspan}">
+                    <td class="px-2 py-1 text-[8px] text-gray-900" colspan="${colspan}">
                         ${!isConsecutiveDuplicate ? getIndentedPPAName(item) : ''}
                         ${getIndentedIndicatorName(item)}
-                        <div class="text-xs text-gray-600 mt-0.5 ${getIndentClass(item)}">
+                        <div class="text-[10px] text-gray-600 mt-0.5 ${getIndentClass(item)}">
                             ${formatOfficeNames(item.office_id) !== 'N/A' ? '<span class="font-medium">Office:</span> ' + formatOfficeNames(item.office_id) : ''}
                             ${formatOfficeNames(item.office_id) !== 'N/A' && item.universe && Object.keys(item.universe).length > 0 ? ' | ' : ''}
                             ${item.universe && Object.keys(item.universe).length > 0 ? '<span class="font-medium">Universe:</span> ' + formatUniverseData(item.universe) : ''}
@@ -1050,27 +1051,27 @@
                 row.className = `hover:bg-gray-50 transition-colors ${bgClass}`;
 
                 row.innerHTML = `
-                    <td class="px-2 py-1 text-xs text-gray-900">
+                    <td class="px-2 py-1 text-[8px] text-gray-900">
                         ${!isConsecutiveDuplicate ? getIndentedPPAName(item) : ''}
                         ${getIndentedIndicatorName(item) || '<div class="text-[10px] text-gray-400 mt-0.5">No indicator</div>'}
                     </td>
-                    <td class="px-2 py-1 text-xs text-gray-900">
+                    <td class="px-2 py-1 text-[10px] text-gray-900">
                         ${formatOfficeNames(item.office_id)}
                     </td>
-                    <td class="px-2 py-1 text-xs text-gray-900 text-center">
+                    <td class="px-2 py-1 text-[10px] text-gray-900 text-center">
                         ${item.universe && Object.keys(item.universe).length > 0 ? formatUniverseData(item.universe, item.targets) : ''}
                     </td>
-                    <td class="px-2 py-1 text-xs text-gray-900 text-center">
+                    <td class="px-2 py-1 text-[10px] text-gray-900 text-center">
                         ${calculateBaseline(item.universe, item.accomplishment, item.office_id)}
                     </td>
-                    <td class="px-2 py-1 text-xs text-gray-900 text-center">
+                    <td class="px-2 py-1 text-[10px] text-gray-900 text-center">
                         ${formatAccomplishmentPerOffice(item.accomplishment, item.office_id)}
                     </td>
-                    <td class="px-2 py-1 text-xs text-gray-900 text-center">
+                    <td class="px-2 py-1 text-[10px] text-gray-900 text-center">
                         ${getCurrentYearAccomplishment(item.accomplishment, item.office_id)}
                     </td>
-                    <td class="px-2 py-1 text-xs text-gray-900 hidden remarks-column">${item.remarks || '-'}</td>
-                    <td class="px-2 py-1 text-xs text-gray-900 hidden actions-column">
+                    <td class="px-2 py-1 text-[10px] text-gray-900 hidden remarks-column">${item.remarks || '-'}</td>
+                    <td class="px-2 py-1 text-[10px] text-gray-900 hidden actions-column">
                         <div class="flex justify-center space-x-2">
                             <button onclick="editRecord(${item.id})" class="text-blue-600 hover:text-blue-800">
                                 <i class="fas fa-edit"></i>
@@ -1142,14 +1143,14 @@
         const recordType = item.ppa?.record_type?.name || item.record_type_name || '';
 
         let numbering = '';
-        let className = 'font-semibold text-lg';
+        let className = 'font-semibold text-sm';
 
         // Simplified approach: use current program counter and track hierarchy by order
         switch (recordType.toUpperCase()) {
             case 'PROGRAM':
                 programCounter++;
                 numbering = `${programCounter}. `;
-                className = 'font-bold text-lg';
+                className = 'font-bold text-sm';
                 // Reset all child counters for new program
                 projectCounter[programCounter] = 0;
                 mainActivityCounter[programCounter] = {};
@@ -1162,7 +1163,7 @@
                 }
                 projectCounter[programCounter]++;
                 numbering = `${programCounter}.${projectCounter[programCounter]}. `;
-                className = 'font-semibold text-base ml-6';
+                className = 'font-semibold text-xs ml-6';
                 // Reset child counters for new project
                 mainActivityCounter[programCounter][projectCounter[programCounter]] = 0;
                 majorActivityCounter[programCounter][projectCounter[programCounter]] = {};
@@ -1176,7 +1177,7 @@
                 mainActivityCounter[programCounter][projectCounter[programCounter]]++;
                 numbering =
                     `${programCounter}.${projectCounter[programCounter]}.${mainActivityCounter[programCounter][projectCounter[programCounter]]}. `;
-                className = 'font-semibold text-base ml-12';
+                className = 'font-semibold text-xs ml-12';
                 // Reset child counters for new main activity
                 majorActivityCounter[programCounter][projectCounter[programCounter]][mainActivityCounter[programCounter]
                     [projectCounter[programCounter]]
@@ -1196,7 +1197,7 @@
                 majorActivityCounter[programCounter][projectCounter[programCounter]][currentMain]++;
                 numbering =
                     `${programCounter}.${projectCounter[programCounter]}.${currentMain}.${majorActivityCounter[programCounter][projectCounter[programCounter]][currentMain]}. `;
-                className = 'font-medium text-base ml-18';
+                className = 'font-medium text-xs ml-18';
                 // Reset child counters for new major activity
                 subActivityCounter[programCounter][projectCounter[programCounter]][currentMain][majorActivityCounter[
                     programCounter][projectCounter[programCounter]][currentMain]] = 0;
@@ -1219,7 +1220,7 @@
                 subActivityCounter[programCounter][projectCounter[programCounter]][currentMainForSub][currentMajor]++;
                 numbering =
                     `${programCounter}.${projectCounter[programCounter]}.${currentMainForSub}.${currentMajor}.${subActivityCounter[programCounter][projectCounter[programCounter]][currentMainForSub][currentMajor]}. `;
-                className = 'font-medium text-sm ml-24';
+                className = 'font-medium text-[10px] ml-24';
                 break;
             case 'ACTIONABLE TASK':
                 const currentMainForTask = mainActivityCounter[programCounter][projectCounter[programCounter]];
@@ -1231,11 +1232,11 @@
                 ][currentMajorForTask];
                 numbering =
                     `${programCounter}.${projectCounter[programCounter]}.${currentMainForTask}.${currentMajorForTask}.${currentSubForTask}.1. `;
-                className = 'font-normal text-sm ml-30';
+                className = 'font-normal text-[10px] ml-30';
                 break;
             default:
                 numbering = '';
-                className = 'font-semibold text-lg';
+                className = 'font-semibold text-sm';
         }
 
         return `<div class="${className}">${numbering}${ppaName}</div>`;
@@ -2898,4 +2899,29 @@
             navigationArrows.classList.remove('flex');
         }
     }
+
+    // Find and highlight record when redirected from dashboard
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const recordId = urlParams.get('record_id');
+        
+        if (recordId) {
+            const checkForRow = setInterval(() => {
+                const row = document.querySelector(`tr[data-record-id="${recordId}"]`);
+                if (row) {
+                    clearInterval(checkForRow);
+                    row.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                    row.style.transition = 'background-color 0.3s';
+                    row.style.backgroundColor = '#fef08a';
+                    setTimeout(() => {
+                        row.style.backgroundColor = '';
+                    }, 2000);
+                }
+            }, 100);
+            setTimeout(() => clearInterval(checkForRow), 5000);
+        }
+    });
 </script>

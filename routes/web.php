@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\BiodiversityController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EditHistoryController;
 use App\Http\Controllers\EnfController;
 use App\Http\Controllers\GassController;
 use App\Http\Controllers\LandsController;
@@ -32,7 +33,7 @@ Route::middleware(['web'])->group(function () {
 
     Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-        Route::get('/dashboard/search', [DashboardController::class, 'search'])->name('dashboard.search');
+        Route::get('/dashboard/sector/{sector}', [DashboardController::class, 'showSector'])->name('dashboard.sector');
 
         // GASS Routes
         Route::get('/gass', [GassController::class, 'index'])->name('gass.index');
@@ -104,5 +105,9 @@ Route::middleware(['web'])->group(function () {
         Route::get('/user-management/{id}/edit', [UserManagementController::class, 'edit'])->name('user-management.edit');
         Route::put('/user-management/{id}', [UserManagementController::class, 'update'])->name('user-management.update');
         Route::delete('/user-management/{id}', [UserManagementController::class, 'destroy'])->name('user-management.destroy');
+
+        // Edit History Routes
+        Route::get('/edit-history', [EditHistoryController::class, 'index'])->name('edit-history.index');
+        Route::get('/edit-history/{id}', [EditHistoryController::class, 'show'])->name('edit-history.show');
     });
 });

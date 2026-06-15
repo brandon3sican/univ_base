@@ -140,6 +140,15 @@
                         class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-emerald-300 rounded-r opacity-0 group-[.active]:opacity-100 transition-opacity">
                     </div>
                 </a>
+                <a href="{{ route('edit-history.index') }}"
+                    class="sidebar-nav-item group relative flex items-center px-3 py-2.5 rounded-lg text-white/90 transition-all duration-200 hover:bg-emerald-700/20 hover:translate-x-1 hover:shadow-sm active:scale-[0.98] {{ request()->routeIs('edit-history.*') ? 'active bg-emerald-600/40' : '' }}">
+                    <i
+                        class="fas fa-history w-5 text-center transition-transform duration-200 group-hover:scale-110 flex-shrink-0"></i>
+                    <span class="sidebar-text ml-3 transition-all duration-300 ease-in-out">Edit History</span>
+                    <div
+                        class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-emerald-300 rounded-r opacity-0 group-[.active]:opacity-100 transition-opacity">
+                    </div>
+                </a>
             </div>
 
         </div>
@@ -218,6 +227,12 @@
                     title="User Management">
                     <i
                         class="fas fa-users w-5 text-center transition-transform duration-200 group-hover:scale-110"></i>
+                </a>
+                <a href="{{ route('edit-history.index') }}"
+                    class="group flex justify-center p-3 rounded-lg text-white/90 transition-all duration-200 hover:bg-emerald-700/20 active:scale-[0.98] {{ request()->routeIs('edit-history.*') ? 'bg-emerald-600/40' : '' }}"
+                    title="Edit History">
+                    <i
+                        class="fas fa-history w-5 text-center transition-transform duration-200 group-hover:scale-110"></i>
                 </a>
             </div>
         </div>

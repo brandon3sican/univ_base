@@ -11,8 +11,8 @@
             <div class="bg-gradient-to-r from-slate-700 to-slate-800 text-white p-6 shadow-lg">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center">
-                        <i class="fas fa-users mr-3 text-2xl"></i>
-                        <h2 class="text-2xl font-bold">User Management</h2>
+                        <i class="fas fa-users mr-3 text-xl"></i>
+                        <h2 class="text-xl font-bold">User Management</h2>
                     </div>
                     <a href="{{ route('user-management.create') }}"
                         class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center">

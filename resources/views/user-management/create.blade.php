@@ -11,7 +11,7 @@
             <div class="bg-linear-to-r from-slate-700 to-slate-800 text-white p-6 shadow-lg">
                 <div class="flex items-center">
                     <i class="fas fa-user-plus mr-3 text-2xl"></i>
-                    <h2 class="text-2xl font-bold">Create New User</h2>
+                    <h2 class="text-xl font-bold">Create New User</h2>
                 </div>
             </div>
 
