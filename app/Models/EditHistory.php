@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class EditHistory extends Model
 {
-    protected $table = 'edit_history';
+    protected $table = 'ub_edit_history';
 
     protected $fillable = [
         'user_id',

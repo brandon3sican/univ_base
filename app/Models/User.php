@@ -13,6 +13,8 @@ class User extends Authenticatable
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
+    protected $table = 'ub_users';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -49,7 +51,7 @@ class User extends Authenticatable
 
     public function roles(): BelongsToMany
     {
-        return $this->belongsToMany(Role::class);
+        return $this->belongsToMany(Role::class, 'ub_role_user');
     }
 
     public function hasRole(string $slug): bool

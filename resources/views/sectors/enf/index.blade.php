@@ -1280,40 +1280,47 @@
         if (!indicatorName) return '';
 
         let indentation = '';
-        let className = 'text-xs text-blue-600 mt-1';
+        let className = '';
 
         // Determine indentation based on record type (same as PPA)
         switch (recordType.toUpperCase()) {
             case 'PROGRAM':
                 indentation = '';
-                className = 'text-xs text-blue-600 mt-1';
+                className = 'ml-0';
                 break;
             case 'PROJECT':
                 indentation = '';
-                className = 'text-xs text-blue-600 mt-1 ml-6';
+                className = 'ml-6';
                 break;
             case 'MAIN ACTIVITY':
                 indentation = '';
-                className = 'text-xs text-blue-600 mt-1 ml-12';
+                className = 'ml-12';
                 break;
             case 'MAJOR ACTIVITY':
                 indentation = '';
-                className = 'text-xs text-blue-600 mt-1 ml-18';
+                className = 'ml-18';
                 break;
             case 'SUB ACTIVITY':
                 indentation = '';
-                className = 'text-xs text-blue-600 mt-1 ml-24';
+                className = 'ml-24';
                 break;
             case 'ACTIONABLE TASK':
                 indentation = '';
-                className = 'text-xs text-blue-600 mt-1 ml-30';
+                className = 'ml-30';
                 break;
             default:
                 indentation = '';
-                className = 'text-xs text-blue-600 mt-1';
+                className = 'ml-0';
         }
 
-        return `<div class="${className}">${indentation} ${indicatorName}</div>`;
+        return `
+            <div class="${className} mt-1">
+                <div class="inline-flex items-center bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg px-2 py-1">
+                    <i class="fas fa-bullseye text-indigo-500 mr-1.5 text-[10px]"></i>
+                    <span class="text-[10px] text-indigo-600 tracking-wide">${indicatorName}</span>
+                </div>
+            </div>
+        `;
     }
 
     // Get indentation class for merged row details based on record type

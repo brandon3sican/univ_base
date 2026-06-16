@@ -10,7 +10,7 @@ class Biodiversity extends Model
 {
     use HasEditHistory;
 
-    protected $table = 'biodiversity';
+    protected $table = 'ub_biodiversity';
 
     protected $fillable = [
         'ppa_id',

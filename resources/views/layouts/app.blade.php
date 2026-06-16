@@ -3,6 +3,7 @@
 @include('layouts.partials.head')
 
 <body class="bg-gray-50">
+    @include('layouts.partials.loading-spinner')
     <div class="flex h-screen overflow-hidden">
 
         @include('layouts.partials.sidebar')

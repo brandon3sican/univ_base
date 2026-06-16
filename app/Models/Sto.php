@@ -10,7 +10,7 @@ class Sto extends Model
 {
     use HasEditHistory;
 
-    protected $table = 'sto';
+    protected $table = 'ub_sto';
 
     protected $fillable = [
         'ppa_id',

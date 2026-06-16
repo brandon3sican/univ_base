@@ -9,6 +9,8 @@ class Indicator extends Model
 {
     use HasFactory;
 
+    protected $table = 'ub_indicators';
+
     protected $fillable = [
         'name',
     ];

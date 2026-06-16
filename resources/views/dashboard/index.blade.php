@@ -141,13 +141,13 @@
                         <div class="grid grid-cols-2 gap-2">
                             <div
                                 class="bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-lg p-3 border border-slate-200/60">
-                                <div class="text-lg font-bold {{ $ubTextColors[$ub] }}">{{ number_format($universe) }}
+                                <div class="text-sm font-bold {{ $ubTextColors[$ub] }}">{{ number_format($universe) }}
                                 </div>
                                 <div class="text-xs text-slate-500 font-medium mt-1 uppercase tracking-wide">Universe</div>
                             </div>
                             <div
                                 class="bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-lg p-3 border border-slate-200/60">
-                                <div class="text-lg font-bold {{ $ubTextColors[$ub] }}">
+                                <div class="text-sm font-bold {{ $ubTextColors[$ub] }}">
                                     {{ number_format($baselineTotals[$ub] ?? 0) }}</div>
                                 <div class="text-xs text-slate-500 font-medium mt-1 uppercase tracking-wide">Baseline</div>
                             </div>
@@ -221,9 +221,6 @@
                     {{ $selectedSector ?? 'Sector' }} Records
                 </h2>
                 <div class="flex items-center gap-3">
-                    <select id="yearFilter" onchange="updateAccomplishmentChart()"
-                        class="bg-white/90 text-slate-800 border border-white/30 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-white/50 backdrop-blur-sm">
-                    </select>
                     <button onclick="closeSectorRecordsModal()"
                         class="text-white/90 hover:text-white transition-colors bg-white/20 px-3 py-2 rounded-lg hover:bg-white/30 backdrop-blur-sm">
                         <i class="fas fa-times text-lg"></i>
@@ -231,11 +228,11 @@
                 </div>
             </div>
             <div class="p-5 overflow-y-auto max-h-[calc(90vh-80px)]">
-                <!-- Accomplishments per Month Chart -->
+                <!-- Accomplishments per Year Chart -->
                 <div class="bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-xl p-5 mb-6 border border-slate-200 shadow-sm">
                     <h3 class="text-sm font-bold text-slate-700 mb-4 flex items-center">
                         <i class="fas fa-chart-line mr-2 text-emerald-600"></i>
-                        Accomplishments per Month
+                        Accomplishments per Year
                     </h3>
                     <div class="h-64">
                         <canvas id="accomplishmentChart"></canvas>
@@ -669,16 +666,21 @@
             if (sectorRecordsModal && hasSectorRecords) {
                 sectorRecordsModal.classList.remove('hidden');
                 sectorRecordsModal.classList.add('flex');
-                populateYearFilter();
                 updateAccomplishmentChart();
             }
+
+            // Close modal when clicking outside
+            sectorRecordsModal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeSectorRecordsModal();
+                }
+            });
         });
 
         function openSectorRecordsModal() {
             const modal = document.getElementById('sectorRecordsModal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
-            populateYearFilter();
             updateAccomplishmentChart();
         }
 
@@ -689,40 +691,15 @@
         }
 
         let accomplishmentChart = null;
-        const monthlyData = @json($monthlyAccomplishments ?? []);
-
-        function populateYearFilter() {
-            const yearFilter = document.getElementById('yearFilter');
-            if (!yearFilter) return;
-
-            const currentYear = new Date().getFullYear();
-            const years = [2022, 2023, 2024, 2025, 2026, 2027, 2028];
-
-            yearFilter.innerHTML = '';
-            years.forEach(year => {
-                const option = document.createElement('option');
-                option.value = year;
-                option.textContent = year;
-                if (year === currentYear) {
-                    option.selected = true;
-                }
-                yearFilter.appendChild(option);
-            });
-        }
+        const yearlyAccomplishmentsWithUniverse = @json($yearlyAccomplishmentsWithUniverse ?? []);
+        const yearlyTargets = @json($yearlyTargets ?? []);
+        const yearlyAccomplishmentsWithoutUniverse = @json($yearlyAccomplishmentsWithoutUniverse ?? []);
 
         function updateAccomplishmentChart() {
-            const selectedYear = parseInt(document.getElementById('yearFilter').value);
-            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            const data = new Array(12).fill(0);
-
-            if (monthlyData && monthlyData[selectedYear]) {
-                for (const [month, value] of Object.entries(monthlyData[selectedYear])) {
-                    const monthIndex = parseInt(month) - 1;
-                    if (monthIndex >= 0 && monthIndex < 12) {
-                        data[monthIndex] = value;
-                    }
-                }
-            }
+            const years = [2022, 2023, 2024, 2025, 2026, 2027, 2028];
+            const accomplishmentWithUniverseData = years.map(year => yearlyAccomplishmentsWithUniverse[year] || 0);
+            const targetData = years.map(year => yearlyTargets[year] || 0);
+            const accomplishmentWithoutUniverseData = years.map(year => yearlyAccomplishmentsWithoutUniverse[year] || 0);
 
             const ctx = document.getElementById('accomplishmentChart');
             if (!ctx) return;
@@ -732,23 +709,35 @@
             }
 
             accomplishmentChart = new Chart(ctx, {
-                type: 'line',
+                type: 'bar',
                 data: {
-                    labels: months,
-                    datasets: [{
-                        label: 'Accomplishments',
-                        data: data,
-                        borderColor: 'rgba(16, 185, 129, 1)',
-                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.4,
-                        pointBackgroundColor: 'rgba(16, 185, 129, 1)',
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 2,
-                        pointRadius: 4,
-                        pointHoverRadius: 6
-                    }]
+                    labels: years,
+                    datasets: [
+                        {
+                            label: 'Accomplishments With Universe',
+                            data: accomplishmentWithUniverseData,
+                            backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                            borderColor: 'rgba(16, 185, 129, 1)',
+                            borderWidth: 2,
+                            borderRadius: 8,
+                        },
+                        {
+                            label: 'Targets',
+                            data: targetData,
+                            backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                            borderColor: 'rgba(59, 130, 246, 1)',
+                            borderWidth: 2,
+                            borderRadius: 8,
+                        },
+                        {
+                            label: 'Accomplishments Without Universe',
+                            data: accomplishmentWithoutUniverseData,
+                            backgroundColor: 'rgba(239, 68, 68, 0.8)',
+                            borderColor: 'rgba(239, 68, 68, 1)',
+                            borderWidth: 2,
+                            borderRadius: 8,
+                        }
+                    ]
                 },
                 options: {
                     responsive: true,
@@ -778,7 +767,16 @@
                     },
                     plugins: {
                         legend: {
-                            display: false
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    size: 12,
+                                    weight: 'bold'
+                                },
+                                usePointStyle: true,
+                                padding: 20
+                            }
                         },
                         tooltip: {
                             backgroundColor: 'rgba(0, 0, 0, 0.85)',
@@ -793,7 +791,7 @@
                             cornerRadius: 8,
                             callbacks: {
                                 label: function(context) {
-                                    return `Accomplishments: ${context.raw.toLocaleString()}`;
+                                    return `${context.dataset.label}: ${context.raw.toLocaleString()}`;
                                 }
                             }
                         }
@@ -801,12 +799,5 @@
                 }
             });
         }
-
-        // Close modal when clicking outside
-        document.getElementById('sectorRecordsModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeSectorRecordsModal();
-            }
-        });
     </script>
 @endsection

@@ -10,7 +10,7 @@ class Ppa extends Model
 {
     use HasFactory, HasEditHistory;
 
-    protected $table = 'ppa';
+    protected $table = 'ub_ppa';
 
     protected $fillable = [
         'name',
@@ -52,6 +52,6 @@ class Ppa extends Model
 
     public function offices()
     {
-        return $this->belongsToMany(Office::class, 'ppa', 'id', 'office_id');
+        return $this->belongsToMany(Office::class, 'ub_ppa', 'id', 'office_id');
     }
 }

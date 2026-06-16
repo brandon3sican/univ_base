@@ -44,9 +44,9 @@ class UserManagementController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
+            'email' => 'required|string|email|max:255|unique:ub_users',
             'password' => 'required|string|min:8|confirmed',
-            'role_id' => 'required|exists:roles,id',
+            'role_id' => 'required|exists:ub_roles,id',
         ]);
 
         $user = User::create([
@@ -85,8 +85,8 @@ class UserManagementController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $id,
-            'role_id' => 'required|exists:roles,id',
+            'email' => 'required|string|email|max:255|unique:ub_users,email,' . $id,
+            'role_id' => 'required|exists:ub_roles,id',
         ]);
 
         $user->update([

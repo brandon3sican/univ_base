@@ -9,6 +9,8 @@ class RecordType extends Model
 {
     use HasFactory;
 
+    protected $table = 'ub_record_types';
+
     protected $fillable = [
         'name',
         'desc',

@@ -10,7 +10,7 @@ class Gass extends Model
 {
     use HasEditHistory;
 
-    protected $table = 'gass';
+    protected $table = 'ub_gass';
     
     protected $fillable = [
         'ppa_id',

@@ -118,14 +118,14 @@ class NraController extends Controller
     {
         try {
             $request->validate([
-                'ppa_id' => 'nullable|exists:ppa,id',
+                'ppa_id' => 'nullable|exists:ub_ppa,id',
                 'new_ppa_name' => 'nullable|string|required_without:ppa_id',
-                'record_type_id' => 'nullable|required_with:new_ppa_name|exists:record_types,id',
+                'record_type_id' => 'nullable|required_with:new_ppa_name|exists:ub_record_types,id',
                 'types_id' => 'nullable|required_with:new_ppa_name|integer|min:1', // More permissive validation
                 'ppa_details_id' => 'nullable', // Remove exists validation since parent_id is nullable
                 'ppa_office_id' => 'nullable', // Allow any format, handle in controller
                 'indicator_text' => 'nullable|string',
-                'indicator_id' => 'nullable|exists:indicators,id',
+                'indicator_id' => 'nullable|exists:ub_indicators,id',
                 'office_id' => 'nullable', // Accept JSON string, handle in controller
                 'universe' => 'nullable', // Accept JSON string, handle in controller
                 'accomplishment' => 'nullable', // Accept JSON string, handle in controller
@@ -354,13 +354,13 @@ class NraController extends Controller
     {
         try {
             $request->validate([
-                'ppa_id' => 'nullable|exists:ppa,id',
+                'ppa_id' => 'nullable|exists:ub_ppa,id',
                 'new_ppa_name' => 'nullable|string',
                 'record_type_id' => 'nullable|required_with:new_ppa_name|integer|min:1',
                 'types_id' => 'nullable|required_with:new_ppa_name|integer|min:1',
                 'ppa_details_id' => 'nullable',
                 'ppa_office_id' => 'nullable',
-                'indicator_id' => 'nullable|exists:indicators,id',
+                'indicator_id' => 'nullable|exists:ub_indicators,id',
                 'indicator_text' => 'nullable|string',
                 // Frontend submits these as JSON strings via FormData (same as store()).
                 'office_id' => 'nullable',

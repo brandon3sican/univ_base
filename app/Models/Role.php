@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Role extends Model
 {
+    protected $table = 'ub_roles';
+
     protected $fillable = [
         'name',
         'slug',
@@ -15,6 +17,6 @@ class Role extends Model
 
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(User::class);
+        return $this->belongsToMany(User::class, 'ub_role_user');
     }
 }

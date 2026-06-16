@@ -10,7 +10,7 @@ class Soilcon extends Model
 {
     use HasEditHistory;
 
-    protected $table = 'soilcon';
+    protected $table = 'ub_soilcon';
 
     protected $fillable = [
         'ppa_id',

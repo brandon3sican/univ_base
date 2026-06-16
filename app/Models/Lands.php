@@ -10,7 +10,7 @@ class Lands extends Model
 {
     use HasEditHistory;
 
-    protected $table = 'lands';
+    protected $table = 'ub_lands';
 
     protected $fillable = [
         'ppa_id',

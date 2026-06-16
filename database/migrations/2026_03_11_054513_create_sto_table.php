@@ -8,11 +8,11 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('sto', function (Blueprint $table) {
+        Schema::create('ub_sto', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('ppa_id')->nullable()->constrained('ppa')->onDelete('set null');
-            $table->foreignId('indicator_id')->nullable()->constrained('indicators')->onDelete('set null');
-            $table->json('office_id')->nullable()->constrained('offices')->onDelete('set null');
+            $table->foreignId('ppa_id')->nullable()->constrained('ub_ppa')->onDelete('set null');
+            $table->foreignId('indicator_id')->nullable()->constrained('ub_indicators')->onDelete('set null');
+            $table->json('office_id')->nullable();
             $table->json('universe')->nullable();
             $table->json('accomplishment')->nullable();
             $table->json('targets')->nullable();
@@ -24,6 +24,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('sto');
+        Schema::dropIfExists('ub_sto');
     }
 };

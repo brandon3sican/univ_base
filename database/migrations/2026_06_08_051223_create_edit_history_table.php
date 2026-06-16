@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('edit_history', function (Blueprint $table) {
+        Schema::create('ub_edit_history', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('ub_users')->onDelete('cascade');
             $table->string('model_type'); // e.g., 'App\Models\Ppa', 'App\Models\Gass', etc.
             $table->unsignedBigInteger('model_id');
             $table->string('action'); // 'created', 'updated', 'deleted'
@@ -32,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('edit_history');
+        Schema::dropIfExists('ub_edit_history');
     }
 };

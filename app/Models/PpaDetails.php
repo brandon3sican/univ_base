@@ -9,6 +9,8 @@ class PpaDetails extends Model
 {
     use HasFactory;
 
+    protected $table = 'ub_ppa_details';
+
     protected $fillable = [
         'parent_id',
         'column_order',

@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('record_types', function (Blueprint $table) {
+        Schema::create('ub_record_types', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();   // PROGRAM, PROJECT, MAIN ACTIVITY, ...
             $table->text('desc')->nullable();
@@ -18,6 +18,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('record_types');
+        Schema::dropIfExists('ub_record_types');
     }
 };

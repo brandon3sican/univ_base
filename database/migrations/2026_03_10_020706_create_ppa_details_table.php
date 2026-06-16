@@ -8,9 +8,9 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('ppa_details', function (Blueprint $table) {
+        Schema::create('ub_ppa_details', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('parent_id')->nullable()->constrained('ppa_details')->onDelete('cascade');
+            $table->foreignId('parent_id')->nullable()->constrained('ub_ppa_details')->onDelete('cascade');
             $table->unsignedInteger('column_order')->default(0);
             $table->timestamps();
 
@@ -21,6 +21,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('ppa_details');
+        Schema::dropIfExists('ub_ppa_details');
     }
 };

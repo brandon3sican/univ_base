@@ -10,7 +10,7 @@ class Enf extends Model
 {
     use HasEditHistory;
 
-    protected $table = 'enf';
+    protected $table = 'ub_enf';
 
     protected $fillable = [
         'ppa_id',

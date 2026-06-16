@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('office_types', function (Blueprint $table) {
+        Schema::create('ub_office_types', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();           // RO, PENRO, CENRO
             $table->text('desc')->nullable();
@@ -18,6 +18,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('office_types');
+        Schema::dropIfExists('ub_office_types');
     }
 };

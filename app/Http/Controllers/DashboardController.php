@@ -176,6 +176,86 @@ class DashboardController extends Controller
             }
         }
 
+        // Calculate yearly accomplishments and targets for the sector
+        $yearlyAccomplishments = [];
+        $yearlyTargets = [];
+        $yearlyAccomplishmentsWithoutUniverse = [];
+        $yearlyAccomplishmentsWithUniverse = [];
+        $years = [2022, 2023, 2024, 2025, 2026, 2027, 2028];
+
+        foreach ($years as $year) {
+            $yearlyAccomplishments[$year] = 0;
+            $yearlyTargets[$year] = 0;
+            $yearlyAccomplishmentsWithoutUniverse[$year] = 0;
+            $yearlyAccomplishmentsWithUniverse[$year] = 0;
+        }
+
+        foreach ($records as $record) {
+            $accomplishmentData = $record->accomplishment;
+            $targetsData = $record->targets;
+            $officeIds = $record->office_id;
+            $universeData = $record->universe;
+
+            if (is_string($accomplishmentData)) {
+                $accomplishmentData = json_decode($accomplishmentData, true);
+            }
+            if (is_string($targetsData)) {
+                $targetsData = json_decode($targetsData, true);
+            }
+            if (is_string($officeIds)) {
+                $officeIds = json_decode($officeIds, true);
+            }
+            if (is_string($universeData)) {
+                $universeData = json_decode($universeData, true);
+            }
+
+            // Calculate universe for this record
+            $recordUniverse = 0;
+            if (is_array($universeData)) {
+                foreach ($universeData as $universeValue) {
+                    if (is_numeric($universeValue) && $universeValue > 0) {
+                        $recordUniverse += (float)$universeValue;
+                    }
+                }
+            }
+
+            // Sum accomplishments by year
+            if (is_array($accomplishmentData) && is_array($officeIds)) {
+                foreach ($officeIds as $officeId) {
+                    if (isset($accomplishmentData[$officeId]) && is_array($accomplishmentData[$officeId])) {
+                        foreach ($accomplishmentData[$officeId] as $year => $accomplishmentValue) {
+                            if ($year && is_numeric($year) && in_array($year, $years) && is_numeric($accomplishmentValue)) {
+                                $yearlyAccomplishments[$year] += (float)$accomplishmentValue;
+                                
+                                // Track accomplishments without universe
+                                if ($recordUniverse === 0) {
+                                    $yearlyAccomplishmentsWithoutUniverse[$year] += (float)$accomplishmentValue;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Sum targets by year
+            if (is_array($targetsData) && is_array($officeIds)) {
+                foreach ($officeIds as $officeId) {
+                    if (isset($targetsData[$officeId]) && is_array($targetsData[$officeId])) {
+                        foreach ($targetsData[$officeId] as $year => $targetValue) {
+                            if ($year && is_numeric($year) && in_array($year, $years) && is_numeric($targetValue)) {
+                                $yearlyTargets[$year] += (float)$targetValue;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Calculate accomplishments with universe (total - without universe)
+        foreach ($years as $year) {
+            $yearlyAccomplishmentsWithUniverse[$year] = $yearlyAccomplishments[$year] - $yearlyAccomplishmentsWithoutUniverse[$year];
+        }
+
         // Also calculate dashboard statistics
         $locations = ['GASS', 'STO', 'ENF', 'BIODIVERSITY', 'LANDS', 'SOILCON', 'NRA'];
         $ubCounts = [];
@@ -253,7 +333,7 @@ class DashboardController extends Controller
             }
         }
 
-        return view('dashboard.index', compact('sectorRecords', 'selectedSector', 'ubCounts', 'universeTotals', 'baselineTotals', 'accomplishmentTotals'));
+        return view('dashboard.index', compact('sectorRecords', 'selectedSector', 'ubCounts', 'universeTotals', 'baselineTotals', 'accomplishmentTotals', 'yearlyAccomplishments', 'yearlyTargets', 'yearlyAccomplishmentsWithoutUniverse', 'yearlyAccomplishmentsWithUniverse'));
     }
 
     public function search(Request $request)

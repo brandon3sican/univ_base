@@ -10,7 +10,7 @@ class Nra extends Model
 {
     use HasEditHistory;
 
-    protected $table = 'nra';
+    protected $table = 'ub_nra';
 
     protected $fillable = [
         'ppa_id',

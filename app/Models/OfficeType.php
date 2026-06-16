@@ -9,6 +9,8 @@ class OfficeType extends Model
 {
     use HasFactory;
 
+    protected $table = 'ub_office_types';
+
     protected $fillable = [
         'name',
         'description',

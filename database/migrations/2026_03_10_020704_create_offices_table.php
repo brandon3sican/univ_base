@@ -8,16 +8,16 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('offices', function (Blueprint $table) {
+        Schema::create('ub_offices', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->foreignId('office_types_id')->constrained('office_types')->onDelete('restrict');
+            $table->foreignId('office_types_id')->constrained('ub_office_types')->onDelete('restrict');
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('offices');
+        Schema::dropIfExists('ub_offices');
     }
 };
