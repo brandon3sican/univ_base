@@ -4,10 +4,18 @@
         <!-- Page Title Section -->
         <div class="flex items-center space-x-3 md:space-x-4">
             <!-- Sidebar Toggle Button -->
-            <button onclick="toggleSidebar()" id="sidebarToggleBtn"
-                class="p-2.5 text-gray-600 hover:text-emerald-600 hover:bg-emerald-50/80 rounded-xl transition-all duration-300 group hover:shadow-md">
-                <i id="sidebarToggleIcon" class="fas fa-bars text-lg transition-transform duration-300 group-hover:rotate-180"></i>
-            </button>
+            <div class="relative">
+                <button onclick="toggleSidebar()" id="sidebarToggleBtn"
+                    class="p-2.5 text-gray-600 hover:text-emerald-600 hover:bg-emerald-50/80 rounded-xl transition-all duration-300 group hover:shadow-md">
+                    <i id="sidebarToggleIcon" class="fas fa-bars text-lg transition-transform duration-300 group-hover:rotate-180"></i>
+                </button>
+                <!-- Tooltip -->
+                <div id="sidebarTooltip"
+                    class="absolute left-full top-1/2 -translate-y-1/2 ml-3 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg shadow-lg whitespace-nowrap opacity-0 transition-opacity duration-300 pointer-events-none z-50">
+                    Click to expand contents section
+                    <div class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 w-2 h-2 bg-gray-800 rotate-45"></div>
+                </div>
+            </div>
 
             <div class="hidden md:block w-1 h-10 bg-gradient-to-b from-emerald-500 via-green-500 to-teal-500 rounded-full shadow-lg shadow-emerald-500/30"></div>
             <div>
@@ -92,6 +100,51 @@
         if (!button && !dropdown.contains(event.target)) {
             dropdown.classList.add('hidden');
             document.getElementById('userDropdownIcon').classList.remove('rotate-180');
+        }
+    });
+
+    // Sidebar tooltip logic
+    let tooltipEnabled = true;
+    let tooltipInterval = null;
+    const tooltip = document.getElementById('sidebarTooltip');
+    const sidebarBtn = document.getElementById('sidebarToggleBtn');
+
+    function isSectorSelected() {
+        // Check if current URL contains a sector parameter
+        const path = window.location.pathname;
+        return path.includes('/dashboard/sector/') || path.includes('/gass/') || path.includes('/sto/') ||
+               path.includes('/enf/') || path.includes('/biodiversity/') || path.includes('/lands/') ||
+               path.includes('/soilcon/') || path.includes('/nra/');
+    }
+
+    function showTooltip() {
+        if (!tooltipEnabled) return;
+        tooltip.classList.remove('opacity-0');
+        setTimeout(() => {
+            tooltip.classList.add('opacity-0');
+        }, 2000);
+    }
+
+    function startTooltipInterval() {
+        if (tooltipInterval) clearInterval(tooltipInterval);
+        if (isSectorSelected()) {
+            tooltipInterval = setInterval(showTooltip, 10000);
+        }
+    }
+
+    // Start tooltip interval only if sector is selected
+    startTooltipInterval();
+
+    // Recheck when URL changes (for SPA navigation)
+    window.addEventListener('popstate', startTooltipInterval);
+
+    // Disable tooltip after first click
+    sidebarBtn.addEventListener('click', function() {
+        tooltipEnabled = false;
+        tooltip.classList.add('opacity-0');
+        if (tooltipInterval) {
+            clearInterval(tooltipInterval);
+            tooltipInterval = null;
         }
     });
 </script>
