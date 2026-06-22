@@ -33,7 +33,7 @@
     </style>
 
     <!-- Data Table Container -->
-    <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+    <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden animate-slide-in-up">
         <!-- Table Header with Summary Statistics -->
         <div class="bg-gradient-to-r from-slate-700 to-slate-800 text-white p-3 shadow-lg">
             <div class="flex items-center justify-between">
@@ -68,6 +68,12 @@
                         <i class="fas fa-eye mr-2"></i>
                         <span id="toggleActionsText">Show Actions</span>
                     </button>
+                    <!-- Compare Years Button -->
+                    <a href="{{ route('gass.compare') }}"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg transition-all duration-200 text-xs font-medium shadow hover:shadow-lg hover:border-2 hover:border-white flex items-center">
+                        <i class="fas fa-chart-bar mr-2"></i>
+                        Compare Years
+                    </a>
                     <!-- Add New Record Button -->
                     <button onclick="openCreateModal()"
                         class="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded-lg transition-all duration-200 text-xs font-medium shadow hover:shadow-lg hover:border-2 hover:border-white flex items-center">

@@ -6,7 +6,7 @@
 
 @section('content')
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+        <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden animate-slide-in-up">
             <!-- Header -->
             <div class="bg-linear-to-r from-slate-700 to-slate-800 text-white p-6 shadow-lg">
                 <div class="flex items-center">
@@ -16,7 +16,7 @@
             </div>
 
             <!-- Form -->
-            <div class="p-6">
+            <div class="p-6 animate-fade-in animate-delay-initial">
                 <form action="{{ route('user-management.update', $user->id) }}" method="POST">
                     @csrf
                     @method('PUT')

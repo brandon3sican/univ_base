@@ -614,4 +614,103 @@ class LandsController extends Controller
             'message' => 'LANDS record deleted successfully',
         ]);
     }
+
+    /**
+     * Compare accomplishments between two years
+     */
+    public function compare(Request $request)
+    {
+        $year1 = $request->query('year1', date('Y') - 1);
+        $year2 = $request->query('year2', date('Y'));
+        
+        $query = Lands::with(['ppa.recordType', 'indicator']);
+        $landsData = $query->get();
+        
+        $offices = Office::all();
+        
+        // Calculate total accomplishments for each year, separated by universe presence
+        $year1Total = 0;
+        $year2Total = 0;
+        $year1TotalWithUniverse = 0;
+        $year2TotalWithUniverse = 0;
+        $year1TotalWithoutUniverse = 0;
+        $year2TotalWithoutUniverse = 0;
+        $allYears = [];
+        
+        foreach ($landsData as $lands) {
+            $accomplishments = $lands->accomplishment ?? [];
+            $years = $lands->years ?? [];
+            $officeIds = $lands->office_id ?? [];
+            $universe = $lands->universe ?? [];
+            
+            // Check if this record has universe data by summing values
+            $recordUniverseSum = 0;
+            if (is_array($universe)) {
+                foreach ($universe as $universeValue) {
+                    if (is_numeric($universeValue) && $universeValue > 0) {
+                        $recordUniverseSum += (float)$universeValue;
+                    }
+                }
+            }
+            $hasUniverse = $recordUniverseSum > 0;
+            
+            if (is_array($years)) {
+                foreach ($years as $yearArray) {
+                    if (is_array($yearArray)) {
+                        foreach ($yearArray as $year) {
+                            if (!in_array($year, $allYears)) {
+                                $allYears[] = $year;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            if (is_array($officeIds)) {
+                foreach ($officeIds as $officeId) {
+                    $officeAccomplishments = $accomplishments[$officeId] ?? [];
+                    
+                    if (is_array($officeAccomplishments)) {
+                        $year1Value = $officeAccomplishments[$year1] ?? 0;
+                        $year2Value = $officeAccomplishments[$year2] ?? 0;
+                        
+                        $year1Total += $year1Value;
+                        $year2Total += $year2Value;
+                        
+                        if ($hasUniverse) {
+                            $year1TotalWithUniverse += $year1Value;
+                            $year2TotalWithUniverse += $year2Value;
+                        } else {
+                            $year1TotalWithoutUniverse += $year1Value;
+                            $year2TotalWithoutUniverse += $year2Value;
+                        }
+                    }
+                }
+            }
+        }
+        
+        sort($allYears);
+        
+        // Generate available years from 2022 to 2028, excluding future years
+        $currentYear = date('Y');
+        $allYears = [];
+        for ($year = 2022; $year <= 2028; $year++) {
+            if ($year <= $currentYear) {
+                $allYears[] = $year;
+            }
+        }
+        
+        return view('sectors.lands.compare', compact(
+            'year1',
+            'year2',
+            'year1Total',
+            'year2Total',
+            'year1TotalWithUniverse',
+            'year2TotalWithUniverse',
+            'year1TotalWithoutUniverse',
+            'year2TotalWithoutUniverse',
+            'allYears',
+            'offices'
+        ));
+    }
 }

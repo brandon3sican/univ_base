@@ -12,69 +12,69 @@
         $totalAccomplishment = array_sum($accomplishmentTotals);
         $overallProgress = $totalUniverse > 0 ? min(100, round((($totalUniverse - $totalBaseline) / $totalUniverse) * 100, 1)) : 0;
     @endphp
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-        <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg p-4 text-white">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
+        <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg p-2.5 text-white animate-slide-in-up animate-delay-initial">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-xs font-medium text-blue-100 uppercase tracking-wide">Total Universe</p>
-                    <p class="text-2xl font-bold mt-1">{{ number_format($totalUniverse) }}</p>
+                    <p class="text-[10px] font-medium text-blue-100 uppercase tracking-wide">Total Universe</p>
+                    <p class="text-xl font-bold mt-0.5">{{ number_format($totalUniverse) }}</p>
                 </div>
-                <div class="bg-white/20 rounded-xl p-3">
-                    <i class="fas fa-database text-xl"></i>
+                <div class="bg-white/20 rounded-lg p-2">
+                    <i class="fas fa-database text-lg"></i>
                 </div>
             </div>
         </div>
-        <div class="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl shadow-lg p-4 text-white">
+        <div class="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl shadow-lg p-2.5 text-white animate-slide-in-up animate-delay-200">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-xs font-medium text-emerald-100 uppercase tracking-wide">Total Baseline</p>
-                    <p class="text-2xl font-bold mt-1">{{ number_format($totalBaseline) }}</p>
+                    <p class="text-[10px] font-medium text-emerald-100 uppercase tracking-wide">Total Baseline</p>
+                    <p class="text-xl font-bold mt-0.5">{{ number_format($totalBaseline) }}</p>
                 </div>
-                <div class="bg-white/20 rounded-xl p-3">
-                    <i class="fas fa-chart-line text-xl"></i>
+                <div class="bg-white/20 rounded-lg p-2">
+                    <i class="fas fa-chart-line text-lg"></i>
                 </div>
             </div>
         </div>
-        <div class="bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl shadow-lg p-4 text-white">
+        <div class="bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl shadow-lg p-2.5 text-white animate-slide-in-up animate-delay-200">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-xs font-medium text-amber-100 uppercase tracking-wide">Total Accomplishment</p>
-                    <p class="text-2xl font-bold mt-1">{{ number_format($totalAccomplishment) }}</p>
+                    <p class="text-[10px] font-medium text-amber-100 uppercase tracking-wide">Total Accomplishment</p>
+                    <p class="text-xl font-bold mt-0.5">{{ number_format($totalAccomplishment) }}</p>
                 </div>
-                <div class="bg-white/20 rounded-xl p-3">
-                    <i class="fas fa-trophy text-xl"></i>
+                <div class="bg-white/20 rounded-lg p-2">
+                    <i class="fas fa-trophy text-lg"></i>
                 </div>
             </div>
         </div>
-        <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl shadow-lg p-4 text-white">
+        <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg p-2.5 text-white animate-slide-in-up animate-delay-400">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-xs font-medium text-purple-100 uppercase tracking-wide">Overall Progress</p>
-                    <p class="text-2xl font-bold mt-1">{{ $overallProgress }}%</p>
+                    <p class="text-[10px] font-medium text-purple-100 uppercase tracking-wide">Overall Progress</p>
+                    <p class="text-xl font-bold mt-0.5">{{ $overallProgress }}%</p>
                 </div>
-                <div class="bg-white/20 rounded-xl p-3">
-                    <i class="fas fa-percentage text-xl"></i>
+                <div class="bg-white/20 rounded-lg p-2">
+                    <i class="fas fa-percentage text-lg"></i>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Combined Progress Chart -->
-    <div class="bg-white rounded-2xl shadow-md border border-slate-200/50 p-4 mb-4">
-        <div class="flex items-center justify-between mb-4">
+    <div class="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-4 mb-4 animate-scale-in animate-delay-initial">
+        <div class="flex items-center justify-between mb-3">
             <h2 class="text-sm font-bold text-slate-800 flex items-center">
                 <i class="fas fa-chart-bar mr-2 text-blue-600"></i>
                 Sector Progress Overview
             </h2>
             <span class="text-xs text-slate-500">Comparison across all sectors</span>
         </div>
-        <div class="h-64">
+        <div class="h-44">
             <canvas id="combinedProgressChart"></canvas>
         </div>
     </div>
 
     <!-- Combined Charts and Cards Section -->
-    <div id="sectors" class="grid grid-cols-7 gap-2 mb-3">
+    <div id="sectors" class="grid grid-cols-7 gap-2 mb-3 animate-fade-in animate-delay-initial">
         @php
             $ubColors = [
                 'GASS' => ['#10B981', '#059669'],
@@ -104,16 +104,21 @@
                 'NRA' => 'fa-water',
             ];
         @endphp
-        @foreach (['GASS', 'STO', 'ENF', 'BIODIVERSITY', 'LANDS', 'SOILCON', 'NRA'] as $ub)
+        @php
+            $sectors = ['GASS', 'STO', 'ENF', 'BIODIVERSITY', 'LANDS', 'SOILCON', 'NRA'];
+            $delays = ['animate-delay-100', 'animate-delay-200', 'animate-delay-300', 'animate-delay-400', 'animate-delay-500', 'animate-delay-initial', 'animate-delay-initial'];
+        @endphp
+        @foreach ($sectors as $index => $ub)
             @php
                 $universe = $universeTotals[$ub] ?? 0;
                 $baseline = $baselineTotals[$ub] ?? 0;
                 $progress = $universe > 0 ? min(100, round((($universe - $baseline) / $universe) * 100, 1)) : 0;
                 $accomplishmentWithoutUniverse = $accomplishmentWithoutUniverseTotals[$ub] ?? 0;
+                $currentDelay = $delays[$index] ?? '';
             @endphp
             <a href="{{ route('dashboard.sector', $ub) }}" class="block">
                 <div
-                    class="bg-white rounded-xl shadow-sm border border-slate-200/50 overflow-hidden hover:shadow-2xl hover:border-slate-400 transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 cursor-pointer group relative @if($accomplishmentWithoutUniverse > 0) border-amber-400 border-2 @endif">
+                    class="bg-white rounded-2xl shadow-md border border-slate-200/60 overflow-hidden hover:shadow-2xl hover:border-slate-400 transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 cursor-pointer group relative @if($accomplishmentWithoutUniverse > 0) border-amber-400 border-2 @endif animate-slide-in-up {{ $currentDelay }}">
                     <!-- Header with icon -->
                     <div class="px-3 py-2.5 flex items-center justify-between"
                         style="background: linear-gradient(135deg, {{ $ubColors[$ub][0] }}, {{ $ubColors[$ub][1] }});">
@@ -131,7 +136,7 @@
 
                     <!-- Chart -->
                     <div class="p-3 pt-2.5 pb-2">
-                        <div class="relative h-36">
+                        <div class="relative h-28">
                             <canvas id="{{ $ub }}Chart"></canvas>
                         </div>
                     </div>
@@ -140,13 +145,13 @@
                     <div class="px-3 pb-3 pt-2">
                         <div class="grid grid-cols-2 gap-2">
                             <div
-                                class="bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-lg p-3 border border-slate-200/60">
+                                class="bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-lg p-2.5 border border-slate-200/60">
                                 <div class="text-sm font-bold {{ $ubTextColors[$ub] }}">{{ number_format($universe) }}
                                 </div>
                                 <div class="text-xs text-slate-500 font-medium mt-1 uppercase tracking-wide">Universe</div>
                             </div>
                             <div
-                                class="bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-lg p-3 border border-slate-200/60">
+                                class="bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-lg p-2.5 border border-slate-200/60">
                                 <div class="text-sm font-bold {{ $ubTextColors[$ub] }}">
                                     {{ number_format($baselineTotals[$ub] ?? 0) }}</div>
                                 <div class="text-xs text-slate-500 font-medium mt-1 uppercase tracking-wide">Baseline</div>
@@ -157,27 +162,27 @@
                         <div class="mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                             <div
                                 class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg p-2.5 border border-amber-200/60">
-                                <div class="text-base font-bold text-amber-600">{{ number_format($accomplishmentTotals[$ub] ?? 0) }}
+                                <div class="text-sm font-bold text-amber-600">{{ number_format($accomplishmentTotals[$ub] ?? 0) }}
                                 </div>
                                 <div class="text-xs text-amber-700 font-medium mt-1 uppercase tracking-wide">Accomplishment</div>
                             </div>
                         </div>
 
                         <!-- Progress -->
-                        <div class="mt-3">
+                        <div class="mt-2.5">
                             <div class="flex items-center justify-between mb-1">
                                 <span class="text-xs font-semibold text-slate-600 uppercase tracking-wide">Progress</span>
                                 <span class="text-sm font-bold {{ $ubTextColors[$ub] }}">{{ $progress }}%</span>
                             </div>
-                            <div class="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
-                                <div class="h-3 rounded-full transition-all duration-700 ease-out"
+                            <div class="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
+                                <div class="h-2.5 rounded-full transition-all duration-700 ease-out"
                                     style="width: {{ $progress }}%; background: linear-gradient(90deg, {{ $ubColors[$ub][0] }}, {{ $ubColors[$ub][1] }}); box-shadow: 0 0 10px {{ $ubColors[$ub][0] }}40;">
                                 </div>
                             </div>
                         </div>
 
                         <!-- View Button -->
-                        <div class="mt-3">
+                        <div class="mt-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                             <button onclick="event.stopPropagation(); window.location.href='{{ route('dashboard.sector', $ub) }}'"
                                 class="w-full text-xs font-semibold text-white bg-gradient-to-r from-slate-600 to-slate-700 px-3 py-2 rounded-lg hover:from-slate-700 hover:to-slate-800 transition-all shadow-sm hover:shadow-md">
                                 <i class="fas fa-table mr-1"></i>View
@@ -191,7 +196,7 @@
 
     @if(isset($totalAccomplishmentWithoutUniverse) && $totalAccomplishmentWithoutUniverse > 0)
     <!-- Warning Banner for Accomplishments Without Universe -->
-    <div class="bg-amber-50 border-l-4 border-amber-500 rounded-r-lg p-3 mb-3 shadow-sm">
+    <div class="bg-amber-50 border-l-4 border-amber-500 rounded-r-lg p-3 mb-3 shadow-md">
         <div class="flex items-start">
             <div class="flex-shrink-0">
                 <i class="fas fa-exclamation-triangle text-amber-500 text-sm"></i>
@@ -200,7 +205,7 @@
                 <h3 class="text-xs font-bold text-amber-800">
                     Accomplishments Without Universe Detected
                 </h3>
-                <div class="mt-0.5 text-xs text-amber-700">
+                <div class="mt-1 text-xs text-amber-700">
                     <p>
                         There are <strong>{{ number_format($totalAccomplishmentWithoutUniverse) }}</strong> total accomplishments across all sectors that do not have a corresponding universe value.
                     </p>
@@ -221,7 +226,7 @@
                     {{ $selectedSector ?? 'Sector' }} Records
                 </h2>
                 <div class="flex items-center gap-3">
-                    <button onclick="closeSectorRecordsModal()"
+                    <button onclick="closeSectorRecordsModal(); window.location.href='{{ route('dashboard') }}'"
                         class="text-white/90 hover:text-white transition-colors bg-white/20 px-3 py-2 rounded-lg hover:bg-white/30 backdrop-blur-sm">
                         <i class="fas fa-times text-lg"></i>
                     </button>

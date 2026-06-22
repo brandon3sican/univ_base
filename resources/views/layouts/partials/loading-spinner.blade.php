@@ -59,9 +59,9 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: linear-gradient(135deg, rgba(16, 185, 129, 0.4) 0%, rgba(59, 130, 246, 0.4) 100%);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
+        background: white;
+        backdrop-filter: blur(50px);
+        -webkit-backdrop-filter: blur(50px);
     }
 
     .loading-spinner-wrapper {

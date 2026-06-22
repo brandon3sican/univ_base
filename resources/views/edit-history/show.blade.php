@@ -21,7 +21,7 @@
             </div>
 
             <!-- Details -->
-            <div class="p-6">
+            <div class="p-6 animate-fade-in animate-delay-initial">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- User Info -->
                     <div class="bg-gray-50 rounded-lg p-4">

@@ -6,7 +6,7 @@
 
 @section('content')
     <div class="w-full px-4 sm:px-6 lg:px-8 py-8">
-        <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+        <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden animate-slide-in-up">
             <!-- Header -->
             <div class="bg-gradient-to-r from-slate-700 to-slate-800 text-white p-6 shadow-lg">
                 <div class="flex items-center justify-between">
@@ -18,7 +18,7 @@
             </div>
 
             <!-- Filters -->
-            <div class="bg-gray-50 border-b border-gray-200 p-4">
+            <div class="bg-gray-50 border-b border-gray-200 p-4 animate-fade-in animate-delay-initial">
                 <form method="GET" action="{{ route('edit-history.index') }}" class="flex flex-wrap gap-4 items-end">
                     <div class="flex-1 min-w-[200px]">
                         <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">Sector Type</label>
@@ -67,7 +67,7 @@
             </div>
 
             <!-- Table -->
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto animate-fade-in animate-delay-100">
                 <table class="w-full">
                     <thead class="bg-gray-50 border-b border-gray-200">
                         <tr>

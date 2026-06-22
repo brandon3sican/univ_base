@@ -38,6 +38,7 @@ Route::middleware(['web'])->group(function () {
         // GASS Routes
         Route::get('/gass', [GassController::class, 'index'])->name('gass.index');
         Route::get('/gass/create', [GassController::class, 'create'])->name('gass.create');
+        Route::get('/gass/compare', [GassController::class, 'compare'])->name('gass.compare');
         Route::post('/gass', [GassController::class, 'store'])->name('gass.store');
         Route::get('/gass/{id}', [GassController::class, 'show'])->name('gass.show');
         Route::get('/gass/{id}/edit', [GassController::class, 'edit'])->name('gass.edit');
@@ -47,6 +48,7 @@ Route::middleware(['web'])->group(function () {
         // STO Routes
         Route::get('/sto', [StoController::class, 'index'])->name('sto.index');
         Route::get('/sto/create', [StoController::class, 'create'])->name('sto.create');
+        Route::get('/sto/compare', [StoController::class, 'compare'])->name('sto.compare');
         Route::post('/sto', [StoController::class, 'store'])->name('sto.store');
         Route::get('/sto/{id}', [StoController::class, 'show'])->name('sto.show');
         Route::get('/sto/{id}/edit', [StoController::class, 'edit'])->name('sto.edit');
@@ -56,6 +58,7 @@ Route::middleware(['web'])->group(function () {
         // ENF Routes
         Route::get('/enf', [EnfController::class, 'index'])->name('enf.index');
         Route::get('/enf/create', [EnfController::class, 'create'])->name('enf.create');
+        Route::get('/enf/compare', [EnfController::class, 'compare'])->name('enf.compare');
         Route::post('/enf', [EnfController::class, 'store'])->name('enf.store');
         Route::get('/enf/{id}', [EnfController::class, 'show'])->name('enf.show');
         Route::get('/enf/{id}/edit', [EnfController::class, 'edit'])->name('enf.edit');
@@ -65,6 +68,7 @@ Route::middleware(['web'])->group(function () {
         // LANDS Routes
         Route::get('/lands', [LandsController::class, 'index'])->name('lands.index');
         Route::get('/lands/create', [LandsController::class, 'create'])->name('lands.create');
+        Route::get('/lands/compare', [LandsController::class, 'compare'])->name('lands.compare');
         Route::post('/lands', [LandsController::class, 'store'])->name('lands.store');
         Route::get('/lands/{id}', [LandsController::class, 'show'])->name('lands.show');
         Route::get('/lands/{id}/edit', [LandsController::class, 'edit'])->name('lands.edit');
@@ -74,6 +78,7 @@ Route::middleware(['web'])->group(function () {
         // BIODIVERSITY Routes
         Route::get('/biodiversity', [BiodiversityController::class, 'index'])->name('biodiversity.index');
         Route::get('/biodiversity/create', [BiodiversityController::class, 'create'])->name('biodiversity.create');
+        Route::get('/biodiversity/compare', [BiodiversityController::class, 'compare'])->name('biodiversity.compare');
         Route::post('/biodiversity', [BiodiversityController::class, 'store'])->name('biodiversity.store');
         Route::get('/biodiversity/{id}', [BiodiversityController::class, 'show'])->name('biodiversity.show');
         Route::get('/biodiversity/{id}/edit', [BiodiversityController::class, 'edit'])->name('biodiversity.edit');
@@ -83,6 +88,7 @@ Route::middleware(['web'])->group(function () {
         // SOILCON Routes
         Route::get('/soilcon', [SoilconController::class, 'index'])->name('soilcon.index');
         Route::get('/soilcon/create', [SoilconController::class, 'create'])->name('soilcon.create');
+        Route::get('/soilcon/compare', [SoilconController::class, 'compare'])->name('soilcon.compare');
         Route::post('/soilcon', [SoilconController::class, 'store'])->name('soilcon.store');
         Route::get('/soilcon/{id}', [SoilconController::class, 'show'])->name('soilcon.show');
         Route::get('/soilcon/{id}/edit', [SoilconController::class, 'edit'])->name('soilcon.edit');
@@ -92,6 +98,7 @@ Route::middleware(['web'])->group(function () {
         // NRA Routes
         Route::get('/nra', [NraController::class, 'index'])->name('nra.index');
         Route::get('/nra/create', [NraController::class, 'create'])->name('nra.create');
+        Route::get('/nra/compare', [NraController::class, 'compare'])->name('nra.compare');
         Route::post('/nra', [NraController::class, 'store'])->name('nra.store');
         Route::get('/nra/{id}', [NraController::class, 'show'])->name('nra.show');
         Route::get('/nra/{id}/edit', [NraController::class, 'edit'])->name('nra.edit');

@@ -204,7 +204,7 @@ This document outlines the complete database structure for the DENR CAR Universi
 ---
 
 ### 9. `sto` (STO Module)
-**Purpose:** STO (Strategic Targets and Outcomes) module data
+**Purpose:** STO (Service to Operations) module data
 **Created:** 2026_03_11_054513_create_sto_table.php
 
 | Column | Type | Constraints | Description |

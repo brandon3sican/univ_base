@@ -6,7 +6,7 @@
 
 @section('content')
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+        <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden animate-slide-in-up">
             <!-- Header -->
             <div class="bg-gradient-to-r from-slate-700 to-slate-800 text-white p-6 shadow-lg">
                 <div class="flex items-center justify-between">
@@ -23,7 +23,7 @@
             </div>
 
             <!-- Table -->
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto animate-fade-in animate-delay-initial">
                 <table class="w-full">
                     <thead class="bg-gray-50 border-b border-gray-200">
                         <tr>

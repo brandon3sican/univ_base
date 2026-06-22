@@ -16,7 +16,7 @@
             </div>
 
             <!-- Form -->
-            <div class="p-6">
+            <div class="p-6 animate-fade-in animate-delay-initial">
                 <form action="{{ route('user-management.store') }}" method="POST">
                     @csrf
 
