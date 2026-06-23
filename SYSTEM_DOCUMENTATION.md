@@ -28,10 +28,12 @@ The system consists of 7 main sector modules, each with identical structure and 
 
 ### Database Structure
 
-The system uses 17 database tables organized into four layers:
+The system uses 20 database tables organized into five layers:
+
+**Note:** All system tables use the `ub_` prefix (University Base) to avoid naming conflicts.
 
 **Laravel System Tables:**
-- `users` - User authentication and management
+- `ub_users` - User authentication and management
 - `cache` - Application caching
 - `jobs` - Background job processing
 
@@ -49,6 +51,11 @@ The system uses 17 database tables organized into four layers:
 **Module Tables:**
 - `gass`, `sto`, `enf`, `biodiversity`, `lands`, `nra`, `soilcon` - Module-specific data
 
+**Authentication & Audit Tables:**
+- `ub_roles` - Role definitions for RBAC
+- `ub_role_user` - User-role pivot table (many-to-many relationship)
+- `ub_edit_history` - Audit trail for all data changes
+
 *For detailed database schema and relationships, refer to `database_structure.md` and `db-schema-and-diagram.md`*
 
 ---
@@ -57,18 +64,22 @@ The system uses 17 database tables organized into four layers:
 
 ### 1. Authentication and Authorization
 
-**User Roles:**
-- **Admin** - Full system access, can manage users, approve/disapprove, assign divisions and PENROs
-- **Chief PMD** - Can approve/disapprove, assign divisions and PENROs
-- **PMD Division** - Can approve/disapprove, assign divisions
-- **Other Division** - Can assign divisions and PENROs
-- **PENRO** - Standard user access
+**Role-Based Access Control (RBAC):**
+The system uses a many-to-many relationship between users and roles via the `ub_role_user` pivot table.
+
+**User Roles (stored in ub_roles):**
+- **admin** - Full system access, can manage users, approve/disapprove, assign divisions and PENROs
+- **chief-pmd** - Can approve/disapprove, assign divisions and PENROs
+- **pmd-division** - Can approve/disapprove, assign divisions
+- **other-division** - Can assign divisions and PENROs
+- **penro** - Standard user access
 
 **Authentication Features:**
 - Login/logout functionality
 - Session management
-- Role-based access control
+- Role-based access control via `ub_roles` and `ub_role_user` tables
 - Permission checks for user management, approvals, and assignments
+- User methods: `hasRole()`, `isAdmin()`, `isChiefPmd()`, `isPmdDivision()`, `isOtherDivision()`, `isPenro()`
 
 ### 2. Dashboard
 
@@ -175,29 +186,31 @@ Each of the 7 modules (GASS, STO, ENF, BIODIVERSITY, LANDS, SOILCON, NRA) provid
 
 **Edit History Features:**
 - Automatic logging of all create, update, and delete operations
-- Tracks user who made the change
-- Records model type and ID
-- Stores change details (old vs new values)
+- Tracks user who made the change via `ub_edit_history` table
+- Records model type and ID (polymorphic relationship)
+- Stores change details (old vs new values) as JSON
 - Provides description of the action
 - Viewable through dedicated edit history interface
+- Indexed on model_type, model_id, user_id, and created_at for performance
 
-**Edit History Data:**
-- User ID
+**Edit History Data (ub_edit_history table):**
+- User ID (foreign key to ub_users)
 - Model type (e.g., "App\Models\Gass")
 - Model ID
 - Action (created, updated, deleted)
-- Changes (JSON diff)
+- Changes (JSON diff of old/new values)
 - Description (human-readable)
-- Timestamp
+- Timestamps (created_at, updated_at)
 
 ### 7. User Management
 
 **User Management Features:**
-- Create new users
+- Create new users in `ub_users` table
 - Edit existing user information
-- Delete users
-- Role assignment
+- Delete users (with cascade to role assignments)
+- Role assignment via `ub_roles` and `ub_role_user` tables
 - Permission-based access control
+- Multiple roles per user support (many-to-many relationship)
 
 **User Permissions:**
 - `canManageUsers()` - Admin only
@@ -530,8 +543,8 @@ For system issues, feature requests, or questions:
 
 ---
 
-**Document Version:** 1.0  
-**Last Updated:** June 18, 2026  
-**System Version:** 3.0  
+**Document Version:** 2.0  
+**Last Updated:** June 22, 2026  
+**System Version:** 3.1  
 **Laravel Version:** Latest  
 **PHP Version:** Latest

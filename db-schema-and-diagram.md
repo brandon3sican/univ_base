@@ -10,7 +10,7 @@ Visual representation of the DENR CAR University Base database structure with re
 ```mermaid
 erDiagram
     %% Laravel System Tables
-    users {
+    ub_users {
         bigint id PK
         string name
         string email UK
@@ -35,6 +35,36 @@ erDiagram
         tinyint reserved_at
         tinyint available_at
         timestamp created_at
+    }
+    
+    %% Authentication & Audit Tables
+    ub_roles {
+        bigint id PK
+        string name UK
+        string slug UK
+        text description
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    ub_role_user {
+        bigint id PK
+        bigint user_id FK
+        bigint role_id FK
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    ub_edit_history {
+        bigint id PK
+        bigint user_id FK
+        string model_type
+        bigint model_id
+        string action
+        json changes
+        string description
+        timestamp created_at
+        timestamp updated_at
     }
     
     %% Office Management
@@ -198,6 +228,9 @@ erDiagram
     }
 
     %% Relationships
+    ub_roles ||--o{ ub_role_user : "has"
+    ub_users ||--o{ ub_role_user : "has"
+    ub_users ||--o{ ub_edit_history : "creates"
     office_types ||--o{ offices : "has many"
     record_types ||--o{ ppa : "classifies"
     ppa_details ||--o{ ppa : "organizes"
@@ -229,6 +262,11 @@ erDiagram
 
 ```mermaid
 flowchart TD
+    %% Authentication
+    U[ub_users] --> RU[ub_role_user]
+    R[ub_roles] --> RU
+    U --> EH[ub_edit_history]
+    
     %% Office Setup
     OT[office_types] --> O[offices]
     
@@ -268,10 +306,12 @@ flowchart TD
     %% Self-reference
     PD --> PD
     
+    classDef auth fill:#fff3e0,stroke:#e65100,stroke-width:2px
     classDef primary fill:#e1f5fe,stroke:#01579b,stroke-width:2px
     classDef secondary fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
     classDef module fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
     
+    class U,R,RU,EH auth
     class OT,O,RT,PD,T,I primary
     class P secondary
     class GASS,STO,ENF,BIO,LAND,NRA,SOIL module
@@ -281,7 +321,23 @@ flowchart TD
 
 ## Table Structure Overview
 
-### 1. Office Management Layer
+### 1. Authentication & Audit Layer
+```mermaid
+graph LR
+    subgraph Authentication and Audit
+        U[ub_users<br/>User Accounts]
+        R[ub_roles<br/>Role Definitions]
+        RU[ub_role_user<br/>User-Role Pivot]
+        EH[ub_edit_history<br/>Audit Trail]
+    end
+    
+    U <-->|many-to-many| R
+    U -->|creates| EH
+    R --> RU
+    U --> RU
+```
+
+### 2. Office Management Layer
 ```mermaid
 graph LR
     subgraph Office Management
@@ -445,6 +501,12 @@ flowchart LR
 ```mermaid
 graph LR
     subgraph Foreign Keys
+        %% Authentication Foreign Keys
+        ub_users.id --> ub_role_user.user_id
+        ub_roles.id --> ub_role_user.role_id
+        ub_users.id --> ub_edit_history.user_id
+        
+        %% Office Management
         office_types.id --> offices.office_types_id
         record_types.id --> ppa.record_type_id
         ppa_details.id --> ppa.ppa_details_id
@@ -496,7 +558,10 @@ graph LR
 ### Expected Records per Table
 | Table | Estimated Records | Growth Rate |
 |-------|------------------|-------------|
-| users | 10-50 | Low |
+| ub_users | 10-50 | Low |
+| ub_roles | 5-10 | Static |
+| ub_role_user | 10-50 | Low |
+| ub_edit_history | 1000-10000+ | High |
 | cache | Variable | High (auto-cleanup) |
 | jobs | Variable | Medium |
 | office_types | 3-5 | Static |
@@ -552,8 +617,13 @@ INDEX (parent_id)
 ```mermaid
 graph TD
     %% Laravel System Tables
-    U[users] --> C[cache]
+    U[ub_users] --> C[cache]
     U --> J[jobs]
+    
+    %% Authentication & Audit Tables
+    R[ub_roles] --> RU[ub_role_user]
+    U --> RU
+    U --> EH[ub_edit_history]
     
     %% Foundation Tables
     OT[office_types] --> O[offices]
@@ -581,11 +651,13 @@ graph TD
     I --> SOIL
     
     classDef laravel fill:#ff5722
+    classDef auth fill:#ff9800
     classDef base fill:#ffeb3b
     classDef structure fill:#4caf50
     classDef module fill:#2196f3
     
     class U,C,J laravel
+    class R,RU,EH auth
     class OT,O,RT,PD,I,T base
     class P structure
     class GASS,STO,ENF,BIO,LAND,NRA,SOIL module
@@ -598,9 +670,15 @@ graph TD
 ```mermaid
 graph TB
     subgraph Laravel System Layer
-        U[Users]
+        U[ub_users]
         C[Cache]
         J[Jobs]
+    end
+    
+    subgraph Authentication & Audit Layer
+        R[ub_roles]
+        RU[ub_role_user]
+        EH[ub_edit_history]
     end
     
     subgraph Foundation Layer
@@ -628,6 +706,9 @@ graph TB
     
     U --> C
     U --> J
+    U --> RU
+    R --> RU
+    U --> EH
     OT --> O
     RT --> P
     PD --> P
@@ -650,11 +731,13 @@ graph TB
     I --> SOIL
     
     classDef laravel fill:#ff5722,stroke:#d84315
+    classDef auth fill:#ff9800,stroke:#e65100
     classDef foundation fill:#e3f2fd,stroke:#1976d2
     classDef business fill:#f3e5f5,stroke:#7b1fa2
     classDef module fill:#e8f5e8,stroke:#388e3c
     
     class U,C,J laravel
+    class R,RU,EH auth
     class OT,O,RT,PD,T,I foundation
     class P business
     class GASS,STO,ENF,BIO,LAND,NRA,SOIL module
@@ -663,7 +746,8 @@ graph TB
 ---
 
 **Created:** May 4, 2026  
-**Database Version:** 3.0  
+**Last Updated:** June 22, 2026  
+**Database Version:** 3.1  
 **Diagram Tool:** Mermaid.js  
-**Total Tables:** 17  
-**Relationships:** 19 Foreign Keys + 8 JSON Arrays
+**Total Tables:** 20  
+**Relationships:** 22 Foreign Keys + 8 JSON Arrays

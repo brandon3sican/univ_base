@@ -12,7 +12,7 @@
         $totalAccomplishment = array_sum($accomplishmentTotals);
         $overallProgress = $totalUniverse > 0 ? min(100, round((($totalUniverse - $totalBaseline) / $totalUniverse) * 100, 1)) : 0;
     @endphp
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
+    {{-- <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
         <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg p-2.5 text-white animate-slide-in-up animate-delay-initial">
             <div class="flex items-center justify-between">
                 <div>
@@ -57,9 +57,9 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 
-    <!-- Combined Progress Chart -->
+    {{-- <!-- Combined Progress Chart -->
     <div class="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-4 mb-4 animate-scale-in animate-delay-initial">
         <div class="flex items-center justify-between mb-3">
             <h2 class="text-sm font-bold text-slate-800 flex items-center">
@@ -71,10 +71,31 @@
         <div class="h-44">
             <canvas id="combinedProgressChart"></canvas>
         </div>
+    </div> --}}
+
+    {{-- @if(isset($totalAccomplishmentWithoutUniverse) && $totalAccomplishmentWithoutUniverse > 0)
+    <!-- Warning Banner for Accomplishments Without Universe -->
+    <div class="bg-amber-50 border-l-4 border-amber-500 rounded-r-lg p-3 mb-3 shadow-md">
+        <div class="flex items-start">
+            <div class="flex-shrink-0">
+                <i class="fas fa-exclamation-triangle text-amber-500 text-sm"></i>
+            </div>
+            <div class="ml-2">
+                <h3 class="text-xs font-bold text-amber-800">
+                    Accomplishments Without Universe Detected
+                </h3>
+                <div class="mt-1 text-xs text-amber-700">
+                    <p>
+                        There are <strong>{{ number_format($totalAccomplishmentWithoutUniverse) }}</strong> total accomplishments across all sectors that do not have a corresponding universe value.
+                    </p>
+                </div>
+            </div>
+        </div>
     </div>
+    @endif --}}
 
     <!-- Combined Charts and Cards Section -->
-    <div id="sectors" class="grid grid-cols-7 gap-2 mb-3 animate-fade-in animate-delay-initial">
+    <div id="sectors" class="grid grid-cols-4 gap-2 mt-2 mb-2 animate-fade-in animate-delay-initial">
         @php
             $ubColors = [
                 'GASS' => ['#10B981', '#059669'],
@@ -193,27 +214,6 @@
             </a>
         @endforeach
     </div>
-
-    @if(isset($totalAccomplishmentWithoutUniverse) && $totalAccomplishmentWithoutUniverse > 0)
-    <!-- Warning Banner for Accomplishments Without Universe -->
-    <div class="bg-amber-50 border-l-4 border-amber-500 rounded-r-lg p-3 mb-3 shadow-md">
-        <div class="flex items-start">
-            <div class="flex-shrink-0">
-                <i class="fas fa-exclamation-triangle text-amber-500 text-sm"></i>
-            </div>
-            <div class="ml-2">
-                <h3 class="text-xs font-bold text-amber-800">
-                    Accomplishments Without Universe Detected
-                </h3>
-                <div class="mt-1 text-xs text-amber-700">
-                    <p>
-                        There are <strong>{{ number_format($totalAccomplishmentWithoutUniverse) }}</strong> total accomplishments across all sectors that do not have a corresponding universe value.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-    @endif
 
     <!-- Sector Records Modal -->
     <div id="sectorRecordsModal" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4">

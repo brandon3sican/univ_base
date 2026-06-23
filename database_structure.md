@@ -3,13 +3,16 @@
 ## Overview
 This document outlines the complete database structure for the DENR CAR University Base system, including all tables, relationships, and data flow.
 
+**Note:** All system tables use the `ub_` prefix (University Base) to avoid naming conflicts with other systems.
+
 ---
 
 ## Laravel System Tables
 
-### 1. `users`
+### 1. `ub_users`
 **Purpose:** Laravel authentication system users
 **Created:** 0001_01_01_000000_create_users_table.php
+**Note:** Table name uses `ub_` prefix
 
 | Column | Type | Constraints | Description |
 |--------|------|------------|-------------|
@@ -49,6 +52,73 @@ This document outlines the complete database structure for the DENR CAR Universi
 | reserved_at | INT | NULLABLE | Reservation timestamp |
 | available_at | INT | | Available timestamp |
 | created_at | TIMESTAMP | | Creation timestamp |
+
+---
+
+### 4. `ub_roles`
+**Purpose:** Role definitions for Role-Based Access Control (RBAC)
+**Created:** 2026_05_26_094654_create_roles_table.php
+
+| Column | Type | Constraints | Description |
+|--------|------|------------|-------------|
+| id | BIGINT (Primary) | Auto-increment | Unique identifier |
+| name | VARCHAR | UNIQUE | Role name (e.g., "Admin", "Chief PMD") |
+| slug | VARCHAR | UNIQUE | Role slug (e.g., "admin", "chief-pmd") |
+| description | TEXT | NULLABLE | Role description |
+| created_at | TIMESTAMP | | Creation timestamp |
+| updated_at | TIMESTAMP | | Last update timestamp |
+
+**Sample Data:**
+- admin - Full system access
+- chief-pmd - Chief PMD role
+- pmd-division - PMD Division role
+- other-division - Other Division role
+- penro - PENRO role
+
+---
+
+### 5. `ub_role_user`
+**Purpose:** Many-to-many relationship between users and roles
+**Created:** 2026_05_26_094750_create_role_user_table.php
+
+| Column | Type | Constraints | Description |
+|--------|------|------------|-------------|
+| id | BIGINT (Primary) | Auto-increment | Unique identifier |
+| user_id | BIGINT (Foreign) | `ub_users(id)` ON DELETE CASCADE | Reference to user |
+| role_id | BIGINT (Foreign) | `ub_roles(id)` ON DELETE CASCADE | Reference to role |
+| created_at | TIMESTAMP | | Creation timestamp |
+| updated_at | TIMESTAMP | | Last update timestamp |
+
+**Unique Constraint:** (user_id, role_id)
+
+**Relationships:**
+- Belongs to: `ub_users`, `ub_roles`
+
+---
+
+### 6. `ub_edit_history`
+**Purpose:** Audit trail for all data changes (create, update, delete)
+**Created:** 2026_06_08_051223_create_edit_history_table.php
+
+| Column | Type | Constraints | Description |
+|--------|------|------------|-------------|
+| id | BIGINT (Primary) | Auto-increment | Unique identifier |
+| user_id | BIGINT (Foreign) | `ub_users(id)` ON DELETE CASCADE | User who made the change |
+| model_type | VARCHAR | | Model class name (e.g., "App\Models\Gass") |
+| model_id | BIGINT | | ID of the affected record |
+| action | VARCHAR | | Action type (created, updated, deleted) |
+| changes | JSON | NULLABLE | JSON diff of old/new values |
+| description | VARCHAR | NULLABLE | Human-readable description |
+| created_at | TIMESTAMP | | Creation timestamp |
+| updated_at | TIMESTAMP | | Last update timestamp |
+
+**Indexes:**
+- (model_type, model_id)
+- (user_id)
+- (created_at)
+
+**Relationships:**
+- Belongs to: `ub_users`
 
 ---
 
@@ -339,8 +409,13 @@ This document outlines the complete database structure for the DENR CAR Universi
 
 ```
 Laravel System:
-users → cache
-users → jobs
+ub_users → cache
+ub_users → jobs
+ub_users → ub_edit_history
+
+Authentication (RBAC):
+ub_users ←→ ub_role_user ←→ ub_roles
+ub_users → ub_edit_history
 
 Office Management:
 office_types
@@ -367,28 +442,41 @@ Module Structure:
 ppa → gass, sto, enf, biodiversity, lands, nra, soilcon
 indicators → gass, sto, enf, biodiversity, lands, nra, soilcon
 offices → all modules (via JSON office_id)
+
+Edit History (Polymorphic):
+ub_edit_history → all models (via model_type, model_id)
 ```
 
 ## Data Flow
 
 1. **Laravel System:**
-   - `users` provides authentication
+   - `ub_users` provides authentication
    - `cache` stores application cache
    - `jobs` handles background tasks
 
-2. **Office Setup:**
+2. **Authentication & Authorization:**
+   - `ub_roles` defines user roles (admin, chief-pmd, pmd-division, other-division, penro)
+   - `ub_role_user` provides many-to-many relationship between users and roles
+   - `ub_edit_history` tracks all data changes with user attribution
+
+3. **Office Setup:**
    - `office_types` defines office categories
    - `offices` stores individual offices with type references
 
-3. **PPA Hierarchy:**
+4. **PPA Hierarchy:**
    - `record_types` defines hierarchy levels (1-6)
    - `ppa_details` provides nested structure
    - `ppa` links everything together with office assignments
 
-4. **Module System:**
+5. **Module System:**
    - All 7 modules (gass, sto, enf, biodiversity, lands, nra, soilcon) have identical structure
    - Each module stores universe, accomplishment, targets as JSON fields
    - Modules link PPAs with indicators and office assignments
+
+6. **Audit Trail:**
+   - `ub_edit_history` captures create, update, delete operations on all models
+   - Stores user ID, model type, model ID, action, changes (JSON), and description
+   - Provides complete audit trail for compliance and debugging
 
 ## Key Features
 
@@ -424,17 +512,20 @@ offices → all modules (via JSON office_id)
 
 ## Migration Order
 1. **Laravel System Tables:**
-   - `users` → `cache` → `jobs`
+   - `ub_users` → `cache` → `jobs`
 
-2. **Foundation Tables:**
+2. **Authentication & Audit Tables:**
+   - `ub_roles` → `ub_role_user` → `ub_edit_history`
+
+3. **Foundation Tables:**
    - `office_types` → `offices`
    - `record_types` → `ppa_details`
    - `indicators` → `types`
 
-3. **Business Logic:**
+4. **Business Logic:**
    - `ppa`
 
-4. **Module Tables (independent, can run in parallel):**
+5. **Module Tables (independent, can run in parallel):**
    - `gass`
    - `sto`
    - `enf`
@@ -445,7 +536,8 @@ offices → all modules (via JSON office_id)
 
 ---
 
-**Last Updated:** May 4, 2026
-**Version:** 3.0
-**Total Tables:** 17
+**Last Updated:** June 22, 2026
+**Version:** 3.1
+**Total Tables:** 20
 **Module Tables:** 7 (all identical structure)
+**Authentication Tables:** 3 (ub_roles, ub_role_user, ub_edit_history)
